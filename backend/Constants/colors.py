@@ -1,0 +1,5 @@
+PINK = '#e6d4d3'
+GREY = '#dfe6d3'
+BLUE = '#d3dce6'
+LIGHT_BLUE = '#d7d3e6'
+LIGHT_RED = '#e6e4d3'
