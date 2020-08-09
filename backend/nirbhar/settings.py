@@ -25,7 +25,7 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 
 }
-client = pymongo.MongoClient("mongodb+srv://admin:bits123@cluster.m7hqs.mongodb.net/tempdb?retryWrites=true&w=majority")
+client = pymongo.MongoClient("mongodb+srv://admin:bits123@ancluster.bjfm9.mongodb.net/User_db?retryWrites=true&w=majority")
 # print(client)
 
 # serverStatusResult = db.command("serverStatus")
@@ -48,7 +48,7 @@ SECRET_KEY = '0mg@wfay8)7v0vai9vj8cbk8kjz^*pbi@nqxp^d8(q_5t9cs%6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nirbhar-be-v1.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['nirbharapp.herokuapp.com', '127.0.0.1']
 
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = (
@@ -115,7 +115,7 @@ WSGI_APPLICATION = 'nirbhar.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'djongo',
-#         'NAME': 'nirbhardb',
+#         'NAME': 'User_db',
 #         'HOST': '127.0.0.1',
 #         'PORT': 27017,
 #     }
@@ -123,9 +123,9 @@ WSGI_APPLICATION = 'nirbhar.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'djongo',
-#         'NAME': 'tempdb',
-#         'HOST': 'mongodb+srv://admin:bits123@cluster.m7hqs.mongodb.net/tempdb?retryWrites=true&w=majority',
-#         'USER': 'tempdb',
+#         'NAME': 'User_db',
+#         'HOST': 'mongodb+srv://admin:bits123@ancluster.bjfm9.mongodb.net/User_db?retryWrites=true&w=majority',
+#         'USER': 'admin',
 #         'PASSWORD': 'bits123',
 #     }
 # }

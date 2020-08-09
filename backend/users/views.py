@@ -23,13 +23,17 @@ def login(request):
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
                 mobile = body_data['mobile']
-                print(mobile)
                 user_query = User.objects(mobile=mobile)
-                print(user_query)
+                print(mobile)
+                print(len(user_query))
                 if len(user_query) == 0:
                     # todo generate a random otp and message the user
-                    new_user = User(mobile=mobile, isConsumer=True)
-                    new_user.save()
+                    user = User(mobile=mobile)
+                    user.save()
+                    resp = create_resp_dict(True, OTP_GENERATED)
+                    resp['newuser'] = True
+                    return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
+                elif len(user_query[0].name)==0 or len(user_query[0].user_type)==0 or len(user_query[0].user_language)==0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
                     return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
@@ -43,8 +47,8 @@ def login(request):
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
-@api_view(['GET', 'POST'])
-def profile(request):
+@api_view(['POST'])
+def update_profile(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
             return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
@@ -58,15 +62,17 @@ def profile(request):
                 user_id = body_data['user_id']
                 user_data = body_data['user']
                 user = User.objects(id=user_id).first()
+                print(user.mobile)
                 for key in user_data:
-                    print(key, user_data[str(key)])
                     user[str(key)] = user_data[str(key)]
                 user.save()
                 return JsonResponse(data=create_resp_dict(True, USER_UPDATED), safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
-    if request.method == 'GET':
+@api_view(['POST'])
+def profile(request):
+    if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
             return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
                                 status=HTTPStatus.BAD_REQUEST)
@@ -99,22 +105,24 @@ def auth(request):
                 mobile = body_data['mobile']
                 otp = body_data['otp']
                 name = body_data['name']
-                user = User.objects(mobile=mobile)
-                user = user[0]
+                user_type = body_data['user_type']
+                user_language = body_data['user_language']
+                user = User.objects(mobile=mobile)[0]
+                print(mobile)
                 if user.otp == otp:
                     # user = json.loads(user)
                     auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile)},
                                             key=settings.SECRET_KEY,
                                             algorithm='HS256')
-                    user = User.objects(mobile=mobile)
-                    user = user[0]
-                    user.isConsumer = True
+                    # user = User(mobile=mobile, name=name, user_type=user_type, language=language)
+                    # user.save()
                     user.name = name
+                    user.user_type = user_type.lower()
+                    user.user_language = user_language.lower()
                     user.save()
                     resp_data = create_resp_dict(True, AUTH_SUCCESS)
                     resp_data['auth_token'] = auth_token.decode('utf-8')
-                    resp_data['userid'] = str(user.id)
-                    print(resp_data)
+                    resp_data['user_id'] = str(user.id)
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
                 else:
                     return JsonResponse(data=create_resp_dict(False, AUTH_FAIL), safe=False,

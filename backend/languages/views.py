@@ -8,7 +8,7 @@ from Constants.response_strings import *
 from languages.models import Language
 from setup import client
 from util.response import create_resp_dict
-
+from .constants import data
 
 @api_view(['POST'])
 def add_language(request):
@@ -47,3 +47,26 @@ def create_language(request):
                 return JsonResponse(data=create_resp_dict(True, CATEGORY_ADDED), safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
+
+@api_view(['POST'])
+def language_data(request):
+    if request.method == 'POST':
+        if request.body is None and len(request.body.decode('utf-8'))==0:
+            return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
+                                status=HTTPStatus.BAD_REQUEST)
+        else:
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+                user_language = body_data['user_language'].lower()
+                # resp = create_resp_dict(True, DATA_FETCHED)
+                if user_language=='english':
+                    resp = create_resp_dict(True, DATA_FETCHED)
+                    resp['user_language'] = data['english']
+                elif user_language=='hindi':
+                    resp = create_resp_dict(True, DATA_FETCHED)
+                    resp['user_language'] = data['hindi']
+                else:
+                    resp = create_resp_dict(False, LANGUAGE_NOT_AVAILABLE)
+                return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
+            except Exception as e:
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK )

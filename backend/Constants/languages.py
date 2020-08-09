@@ -1,1 +1,1 @@
-LANGS = ('ENGLISH', 'HINDI')
+LANGS = ('english', 'hindi')

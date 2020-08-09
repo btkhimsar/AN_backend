@@ -2,12 +2,12 @@ from mongoengine import connect
 
 USER = 'admin'
 PASSWORD = 'bits123'
-DATABASE = 'tempdb'
+DATABASE = 'User_db'
 
 client = connect(
-    db='tempdb',
+    db='User_db',
     username=USER,
     password=PASSWORD,
-    host="mongodb+srv://" + USER + ":" + PASSWORD + "@cluster.m7hqs.mongodb.net/" + DATABASE + "?retryWrites=true&w=majority"
+    host="mongodb+srv://" + USER + ":" + PASSWORD + "@ancluster.bjfm9.mongodb.net/" + DATABASE + "?retryWrites=true&w=majority"
 )
 print(client)
