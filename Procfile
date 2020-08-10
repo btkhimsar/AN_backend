@@ -1,1 +1,1 @@
-web: gunicorn nirbharapp.wsgi --log-file -
+web: gunicorn nirbharapp.wsgi
