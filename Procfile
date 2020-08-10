@@ -1,1 +1,1 @@
-web: gunicorn nirbhar.wsgi
+web: gunicorn nirbharapp.wsgi
