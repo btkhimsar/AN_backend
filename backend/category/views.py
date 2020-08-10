@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 
-from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED
+from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, NO_CATEGORY
 from setup import client
 from util.response import create_resp_dict
 from .constants import data
@@ -23,15 +23,16 @@ def super_category_list(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 user_language = body_data['user_language'].lower()
                 user_type = body_data['user_type'].lower()
-                # if (user_type=='consumer'):
                 list = SuperCategory.objects
-                super_categories = []
-                for i in list:
-                    temp = request_json(request=i, user_language=user_language)
-                    super_categories.append(temp)
-                resp = create_resp_dict(True, DATA_FETCHED)
-                resp['super_categories'] = super_categories
-                return JsonResponse(data=resp, safe=True, status=HTTPStatus.OK)
+                if len(list)==0:
+                    super_categories = []
+                    for i in list:
+                        temp = request_json(request=i, user_language=user_language)
+                        super_categories.append(temp)
+                    resp = create_resp_dict(True, DATA_FETCHED)
+                    resp['super_categories'] = super_categories
+                    return JsonResponse(data=resp, safe=True, status=HTTPStatus.OK)
+                return JsonResponse(data=create_resp_dict(False, NO_CATEGORY), safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
