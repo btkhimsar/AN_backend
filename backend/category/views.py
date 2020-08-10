@@ -55,7 +55,9 @@ def handle_category(request):
                 for j in description:
                     new_category.description[j] = description[j]
                 new_category.save()
-                return JsonResponse(data=create_resp_dict(True, SUBCATEGORY_ADDED), safe=False, status=HTTPStatus.OK)
+                resp = create_resp_dict(True, SUBCATEGORY_ADDED)
+                resp['category_id'] = str(new_category.id)
+                return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
