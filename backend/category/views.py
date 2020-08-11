@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 
-from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED
+from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, INCORRECT_REQUEST
 from setup import client
 from util.response import create_resp_dict
 from .constants import data
@@ -23,7 +23,6 @@ def super_category_list(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 user_language = body_data['user_language'].lower()
                 user_type = body_data['user_type'].lower()
-                # if (user_type=='consumer'):
                 list = SuperCategory.objects
                 super_categories = []
                 for i in list:
