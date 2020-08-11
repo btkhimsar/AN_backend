@@ -17,6 +17,5 @@ class Request(Document):
     isPaid = fields.BooleanField(default=False)
     isExpired = fields.BooleanField(default=False)
     provider_id = fields.StringField(max_length=300)
-    complaints = fields.ListField(fields.StringField())
 
     meta = {"db_alias": "default"}

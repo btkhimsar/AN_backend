@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 
+from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, NO_CATEGORY, INCORRECT_REQUEST
 from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, NO_CATEGORY
 from setup import client
 from util.response import create_resp_dict
@@ -24,7 +25,7 @@ def super_category_list(request):
                 user_language = body_data['user_language'].lower()
                 user_type = body_data['user_type'].lower()
                 list = SuperCategory.objects
-                if len(list)==0:
+                if len(list)!=0:
                     super_categories = []
                     for i in list:
                         temp = request_json(request=i, user_language=user_language)
@@ -88,7 +89,19 @@ def handle_super_category(request):
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
-@api_view(['GET'])
-def category_list(request):
-    if request.method == 'GET':
-        return JsonResponse(data=data, safe=False, status=HTTPStatus.OK)
+# @api_view(['POST'])
+# def category_list(request):
+#     if request.method == 'POST':
+#         if request.body is None or len(request.body.decode('utf-8'))==0:
+#             return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
+#                                 status=HTTPStatus.BAD_REQUEST)
+#         else:
+#             try:
+#                 print(data)
+#                 body_data = json.loads(request.body.decode('utf-8'))
+#                 user_language = body_data['user_language'].lower()
+#                 if user_language=='english':
+#                     return JsonResponse(data=data, safe=False, status=HTTPStatus.OK)
+#                 return JsonResponse(data={'message': "language should be english only."}, safe=False, status=HTTPStatus.OK)
+#             except Exception as e:
+#                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
