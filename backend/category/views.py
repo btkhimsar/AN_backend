@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 
-from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED
+from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, NO_CATEGORY, INCORRECT_REQUEST
 from setup import client
 from util.response import create_resp_dict
 from .constants import data
@@ -23,15 +23,16 @@ def super_category_list(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 user_language = body_data['user_language'].lower()
                 user_type = body_data['user_type'].lower()
-                # if (user_type=='consumer'):
                 list = SuperCategory.objects
-                super_categories = []
-                for i in list:
-                    temp = request_json(request=i, user_language=user_language)
-                    super_categories.append(temp)
-                resp = create_resp_dict(True, DATA_FETCHED)
-                resp['super_categories'] = super_categories
-                return JsonResponse(data=resp, safe=True, status=HTTPStatus.OK)
+                if len(list)!=0:
+                    super_categories = []
+                    for i in list:
+                        temp = request_json(request=i, user_language=user_language)
+                        super_categories.append(temp)
+                    resp = create_resp_dict(True, DATA_FETCHED)
+                    resp['super_categories'] = super_categories
+                    return JsonResponse(data=resp, safe=True, status=HTTPStatus.OK)
+                return JsonResponse(data=create_resp_dict(False, NO_CATEGORY), safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
@@ -55,7 +56,9 @@ def handle_category(request):
                 for j in description:
                     new_category.description[j] = description[j]
                 new_category.save()
-                return JsonResponse(data=create_resp_dict(True, SUBCATEGORY_ADDED), safe=False, status=HTTPStatus.OK)
+                resp = create_resp_dict(True, SUBCATEGORY_ADDED)
+                resp['category_id'] = str(new_category.id)
+                return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
@@ -85,7 +88,19 @@ def handle_super_category(request):
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
-@api_view(['GET'])
-def category_list(request):
-    if request.method == 'GET':
-        return JsonResponse(data=data, safe=False, status=HTTPStatus.OK)
+# @api_view(['POST'])
+# def category_list(request):
+#     if request.method == 'POST':
+#         if request.body is None or len(request.body.decode('utf-8'))==0:
+#             return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
+#                                 status=HTTPStatus.BAD_REQUEST)
+#         else:
+#             try:
+#                 print(data)
+#                 body_data = json.loads(request.body.decode('utf-8'))
+#                 user_language = body_data['user_language'].lower()
+#                 if user_language=='english':
+#                     return JsonResponse(data=data, safe=False, status=HTTPStatus.OK)
+#                 return JsonResponse(data={'message': "language should be english only."}, safe=False, status=HTTPStatus.OK)
+#             except Exception as e:
+#                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
