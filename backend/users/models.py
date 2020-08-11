@@ -6,6 +6,7 @@ from Constants.user_type import USER_TYPE
 
 class User(Document):
     name = fields.StringField(max_length=30, default="")
+    otp = fields.StringField(max_length=4, default="1111")
     expiry = fields.DateTimeField()
     email = fields.StringField(default="", required=False)
     mobile = fields.StringField(max_length=10, required=True)
