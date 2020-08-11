@@ -66,6 +66,7 @@ def update_profile(request):
                                 user[str(key)] = user_data[str(key)]
                         else:
                             resp['user_details'] = "User's mobile, user_type, name can't be changed."
+                            resp['user_details'] = "User's mobile, user_type, work_category, name can't be changed."
                     else:
                         if key!='name' and key!='mobile' and key!='user_type':
                             user[str(key)] = user_data[str(key)]

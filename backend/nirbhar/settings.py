@@ -16,6 +16,7 @@ from random import randint
 import pymongo
 from pprint import pprint
 import datetime
+import django-heroku
 
 JWT_AUTH = {
 
@@ -167,3 +168,5 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 STATIC_URL = '/static/'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+django_heroku.settings(locals())

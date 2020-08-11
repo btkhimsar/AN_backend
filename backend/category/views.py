@@ -5,6 +5,7 @@ from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 
 from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, NO_CATEGORY, INCORRECT_REQUEST
+from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, NO_CATEGORY
 from setup import client
 from util.response import create_resp_dict
 from .constants import data
