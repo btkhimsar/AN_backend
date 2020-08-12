@@ -1,3 +1,5 @@
+from category.models import Category
+
 def create_user_dict(user):
     user_details = {'mobile': user.mobile, 'name': user.name, 'user_language': user.user_language,
                     'user_type':user.user_type}
@@ -8,7 +10,8 @@ def create_user_dict(user):
     if user.work_radius is not None and user.work_radius<=10 and user.work_radius>=3:
         user_details['work_radius'] = user.work_radius
     if user.work_category is not None:
-        user_details['work_category'] = user.work_category
+        category = Category.objects.get(id=user.work_category)
+        user_details['work_category'] = category.name[user.user_language]
     if len(user.address):
         user_details['address'] = user.address
     return user_details

@@ -48,7 +48,7 @@ SECRET_KEY = '0mg@wfay8)7v0vai9vj8cbk8kjz^*pbi@nqxp^d8(q_5t9cs%6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nirbharapp.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['nirbhar.herokuapp.com', '127.0.0.1']
 
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = (

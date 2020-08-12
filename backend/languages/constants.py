@@ -38,7 +38,23 @@ data = {
         'skip_tutorial': 'Skip Tutorial?',
         'next': 'Next',
         'your_request_has_been_registered': 'Your Request Has been Registered',
-        'retry': 'Retry'
+        'retry': 'Retry',
+        'who_are_you_looking_out_for': 'Who are you looking out for?',
+        'are_you_looking_for_such_work_instead': 'Are you looking for such work instead?',
+        'are_you_one_of_these': 'Are you one of these?',
+        'back_to_home_screen': 'Back To Home Screen',
+        'choose_language_hindi': 'भाषा चुनें',
+        'you_can_change_hindi': 'आप इसे बाद में कभी भी बदल सकते हैं',
+        'aatmnirbhar': 'AatmNirbhar',
+        'made_in_india': 'made in india',
+        'why_are_you_here_today': 'Why are you here today?',
+        'get_my_work_done': 'Get my work done',
+        'hire_someone_like_a_plumber_electrician_and_more': 'Hire someone like a plumber, electrician and more',
+        'find_work_near_you_based_on_your_skills': 'Find work near you based on your skills',
+        'not_sure': 'Not sure?',
+        'have_an_account': 'Have an account?',
+        'login_using_mobile': 'Login Using Mobile',
+        'no_request_found': 'No Request Found'
     },
     'hindi': {
         'app_name': 'आतमनिर्भर',
@@ -79,6 +95,22 @@ data = {
         'skip_tutorial': 'ट्यूटोरियल को छोड़ दें?',
         'next': 'आगे',
         'your_request_has_been_registered': 'आपका अनुरोध पंजीकृत हो गया है',
-        'retry': 'पुन: प्रयास करें'
+        'retry': 'पुन: प्रयास करें',
+        'who_are_you_looking_out_for': 'आप किसकी तलाश कर रहे हैं?',
+        'are_you_looking_for_such_work_instead': 'क्या आप इसके बजाय ऐसे काम की तलाश कर रहे हैं?',
+        'are_you_one_of_these': 'क्या आप इनमें से एक हैं?',
+        'back_to_home_screen': 'होम स्क्रीन पर वापस',
+        'choose_language_hindi': 'भाषा चुनें',
+        'you_can_change_hindi': 'आप इसे बाद में कभी भी बदल सकते हैं',
+        'aatmnirbhar': 'AatmNirbhar',
+        'made_in_india': 'भारत में बनी',
+        'why_are_you_here_today': 'आज यहाँ आप क्या कर रहे हैं?',
+        'get_my_work_done': 'मेरा काम करवाओ',
+        'hire_someone_like_a_plumber_electrician_and_more': 'किसी को प्लंबर, इलेक्ट्रीशियन और बहुत कुछ पसंद करें',
+        'find_work_near_you_based_on_your_skills': 'अपने कौशल के आधार पर आप के पास काम का पता लगाएं',
+        'not_sure': 'निश्चित नहीं?',
+        'have_an_account': 'खाता होना?',
+        'login_using_mobile': 'मोबाइल का उपयोग कर लॉगिन करें',
+        'no_request_found': 'कोई अनुरोध नहीं मिला'
     }
 }

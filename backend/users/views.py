@@ -12,6 +12,7 @@ from setup import client
 from util.response import create_resp_dict
 from .models import User
 from .utility import create_user_dict
+from category.models import Category
 
 
 @api_view(['POST'])
@@ -63,10 +64,11 @@ def update_profile(request):
                             if key=='work_category' and user[str(key)] is not None:
                                 resp['user_details'] = "User's mobile, user_type, work_category, name can't be changed."
                             else:
+                                if key=='work_category':
+                                    category = Category.objects.get(id=user_data[key])
                                 user[str(key)] = user_data[str(key)]
                         else:
                             resp['user_details'] = "User's mobile, user_type, name can't be changed."
-                            resp['user_details'] = "User's mobile, user_type, work_category, name can't be changed."
                     else:
                         if key!='name' and key!='mobile' and key!='user_type':
                             user[str(key)] = user_data[str(key)]

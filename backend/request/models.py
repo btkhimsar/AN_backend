@@ -8,7 +8,6 @@ class Request(Document):
     category_id = fields.StringField(required=True)
     mobile = fields.StringField(max_length=11)
     # todo keep a check
-    radius = fields.IntField(required=True)
     location = fields.PointField(required=True)
     comment = fields.StringField(max_length=1000)
     created_at = fields.DateTimeField(required=True)
