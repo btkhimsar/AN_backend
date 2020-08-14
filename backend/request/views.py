@@ -28,20 +28,24 @@ def work_requests(request):
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
                 location = body_data['location']
-                radius_in_km = body_data['radius']
-                radius_in_radian = radius_in_km/6378
+                radius = body_data['radius']
+                # radius_in_radians = radius/111.12
                 resp_data = create_resp_dict(True, WORK_REQUEST_FETCHED)
                 resp_data['workrequests'] = []
                 user = User.objects.get(id=user_id)
-                workrequests = Request.objects(
-                    location__geo_within_center=[(location['latitude'], location['longitude']), radius_in_radian], category_id=user.work_category)
-                for i in workrequests:
+                work_requests = Request.objects(
+                    location__geo_within_center=[(location['latitude'], location['longitude']), radius])
+                # work_requests = Request.objects(
+                #     location__geo_within_center=[(location['latitude'], location['longitude']), radius])
+                for i in work_requests:
                     user = User.objects.get(id=i.user_id)
                     workrequest = request_json_for_workrequests(i)
                     workrequest['title'] = 'Request from {}'.format(user.name)
                     resp_data['workrequests'].append(workrequest)
                 resp_data['location_text'] = LOCATIONS_TEXT
                 resp_data['location_subtext'] = LOCATIONS_SUBTEXT
+                resp_data['count'] = str(len(resp_data['workrequests']))
+                print(len(resp_data['workrequests']))
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,

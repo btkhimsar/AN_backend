@@ -54,7 +54,13 @@ data = {
         'not_sure': 'Not sure?',
         'have_an_account': 'Have an account?',
         'login_using_mobile': 'Login Using Mobile',
-        'no_request_found': 'No Request Found'
+        'no_request_found': 'No Request Found',
+        'my_profile': 'My Profile',
+        'log_out': 'Log Out',
+        'enter_mobile_no_correctly': 'Enter Mobile No Correctly',
+        'enter_otp_no_correctly': 'Enter OTP No Correctly',
+        'enter_name': 'Enter Name',
+        'work_request_for_you': 'Work Request For You'
     },
     'hindi': {
         'app_name': 'आतमनिर्भर',
@@ -111,6 +117,12 @@ data = {
         'not_sure': 'निश्चित नहीं?',
         'have_an_account': 'खाता होना?',
         'login_using_mobile': 'मोबाइल का उपयोग कर लॉगिन करें',
-        'no_request_found': 'कोई अनुरोध नहीं मिला'
+        'no_request_found': 'कोई अनुरोध नहीं मिला',
+        'my_profile': 'मेरी प्रोफाइल',
+        'log_out': 'लॉग आउट',
+        'enter_mobile_no_correctly': 'सही ढंग से मोबाइल दर्ज करें',
+        'enter_otp_no_correctly': 'सही ढंग से OTP दर्ज करें',
+        'enter_name': 'नाम दर्ज',
+        'work_request_for_you': 'आपके लिए वर्क रिक्वेस्ट'
     }
 }
