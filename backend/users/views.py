@@ -34,7 +34,9 @@ def login(request):
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
                 else:
+                    user = User.objects.get(mobile=mobile)
                     resp = create_resp_dict(True, USER_EXISTS)
+                    resp['user'] = {"name": user.name, "user_language": user.user_language}
                     resp['newuser'] = False
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
             except Exception as e:
@@ -116,10 +118,11 @@ def auth(request):
                 name = body_data['name']
                 user_type = body_data['user_type']
                 user_language = body_data['user_language']
+                token = body_data['token']
                 if user_otp == otp:
                     user_count = User.objects(mobile=mobile)
                     if len(user_count)==0:
-                        user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language)
+                        user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language, token=token)
                         user.save()
                         auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile)},
                                                 key=settings.SECRET_KEY,

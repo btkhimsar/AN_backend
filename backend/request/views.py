@@ -29,12 +29,12 @@ def work_requests(request):
                 user_id = body_data['user_id']
                 location = body_data['location']
                 radius = body_data['radius']
-                # radius_in_radians = radius/111.12
+                radius_in_radians = radius/101
                 resp_data = create_resp_dict(True, WORK_REQUEST_FETCHED)
                 resp_data['workrequests'] = []
                 user = User.objects.get(id=user_id)
                 work_requests = Request.objects(
-                    location__geo_within_center=[(location['latitude'], location['longitude']), radius])
+                    location__geo_within_center=[(location['latitude'], location['longitude']), radius_in_radians])
                 # work_requests = Request.objects(
                 #     location__geo_within_center=[(location['latitude'], location['longitude']), radius])
                 for i in work_requests:

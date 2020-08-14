@@ -16,5 +16,6 @@ class User(Document):
     user_type = fields.StringField(choices=USER_TYPE, default="consumer", required=False)
     work_radius = fields.IntField(min_value=3, max_value=10, required=False)
     work_category = fields.StringField(min_value=1, max_length=100, required=False)
+    token = fields.StringField(required=True, default="")
 
     meta = {"db_alias": "default"}
