@@ -60,7 +60,16 @@ data = {
         'enter_mobile_no_correctly': 'Enter Mobile No Correctly',
         'enter_otp_no_correctly': 'Enter OTP No Correctly',
         'enter_name': 'Enter Name',
-        'work_request_for_you': 'Work Request For You'
+        'work_request_for_you': 'Work Request For You',
+        'what_do_you_do': 'WHAT DO YOU DO?',
+        'construction_painter': 'Construction - Painter',
+        'almost_done': 'Almost Done',
+        'i_agree_to_the_terms_and_condition_and_privacy_policy': 'I agree to the Terms and Condition and privacy policy',
+        'we_will_send_otp_on_this_number': 'We will send OTP on this number',
+        'maid': 'Maid',
+        'you_recive': 'You will recive work requests in nearby location for',
+        'confirm': 'Confirm',
+        'once_you_confirm': 'Once you confirm nearby workers will contact you on phone to discuss your requirement'
     },
     'hindi': {
         'app_name': 'आतमनिर्भर',
@@ -123,6 +132,15 @@ data = {
         'enter_mobile_no_correctly': 'सही ढंग से मोबाइल दर्ज करें',
         'enter_otp_no_correctly': 'सही ढंग से OTP दर्ज करें',
         'enter_name': 'नाम दर्ज',
-        'work_request_for_you': 'आपके लिए वर्क रिक्वेस्ट'
+        'work_request_for_you': 'आपके लिए वर्क रिक्वेस्ट',
+        'what_do_you_do': 'आप क्या करते हैं?',
+        'construction_painter': 'निर्माण - चित्रकार',
+        'almost_done': 'लगभग हो गया',
+        'i_agree_to_the_terms_and_condition_and_privacy_policy': 'मैं नियम और शर्त और गोपनीयता नीति से सहमत हूं',
+        'we_will_send_otp_on_this_number': 'हम इस नंबर पर OTP भेजेंगे',
+        'maid': 'नौकरानी',
+        'you_recive': 'आप आस-पास के स्थान के लिए कार्य अनुरोधों को पुनः प्राप्त करेंगे',
+        'confirm': 'पुष्टि करें',
+        'once_you_confirm': 'एक बार जब आप पास के श्रमिकों की पुष्टि करते हैं, तो आपकी आवश्यकता पर चर्चा करने के लिए आपसे संपर्क करेंगे'
     }
 }
