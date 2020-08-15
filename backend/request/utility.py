@@ -1,5 +1,5 @@
 from Constants.image_urls import HOME_ICON
-from category.models import Category
+from category.models import Category, SuperCategory
 from users.models import User
 
 def create_point_dict(latitude, longitude):
@@ -8,21 +8,27 @@ def create_point_dict(latitude, longitude):
 
 
 def request_json_for_myrequests(request):
-    request_data = {'type': 'request', 'comment': request.comment,'isCompleted': request.isCompleted,
-                    'isPaid': request.isPaid, 'isExpired':request.isExpired, 'provider_id': request.provider_id,
-                    'requestId': str(request.id)}
+    request_data = {}
     user = User.objects.get(id=request.user_id)
+    language = user.user_language
     category = Category.objects.get(id=request.category_id)
-    request_data['subtitle'] = category.name[user.user_language]
-    if user.user_language=='english':
+    super_category = SuperCategory.objects.get(id=request.super_category_id)
+    if language=='english':
         request_data['title'] = "You requested for"
-    elif user.user_language=='hindi':
+    elif language=='hindi':
         request_data['title'] ='आपने निवेदन किया'
+    request_data['subtitle'] = '{} > {}'.format(super_category.name[language], category.name[language])
+    request_data['isCompleted'] = request.isCompleted
+    request_data['request_id'] = str(request.id)
     return request_data
 
 def request_json_for_workrequests(request):
-    request_data = {'type': 'request', 'mobile': request.mobile, 'subtitle_icon': HOME_ICON,
-                    'category_id': request.category_id, 'location': request.location,
-                    'created_at': request.created_at, 'user_id': request.user_id,
-                    'provider_id': request.provider_id, 'complaints': request.complaints, 'requestId': str(request.id)}
+    request_data = {}
+    user = User.objects.get(id=request.user_id)
+    request_data['title'] = 'Request from {}'.format(user.name)
+    request_data['subtitle'] = request.location_name
+    request_data['subtitle_icon'] = HOME_ICON
+    request_data['mobile'] = request.mobile
+    request_data['type'] = 'request'
+    request_data['request_id'] = str(request.id)
     return request_data
