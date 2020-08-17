@@ -150,7 +150,7 @@ def auth(request):
 @api_view(['GET'])
 def notification(request):
     resp = requests.post('https://fcm.googleapis.com/fcm/send', json=body, headers=headers)
-    cd if resp.status_code!=200:
+    if resp.status_code!=200:
         temp = create_resp_dict(False, "Something got wrong")
         temp['sending_status'] = resp.status_code
         return JsonResponse(data=temp, safe=False, status=HTTPStatus.OK)
