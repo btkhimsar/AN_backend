@@ -1,6 +1,6 @@
 import json
 from http import HTTPStatus
-
+import requests
 import jwt
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
@@ -13,6 +13,7 @@ from util.response import create_resp_dict
 from .models import User
 from .utility import create_user_dict
 from category.models import Category
+from .constants import body, headers
 
 
 @api_view(['POST'])
@@ -145,3 +146,14 @@ def auth(request):
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,
                                     status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def notification(request):
+    resp = requests.post('https://fcm.googleapis.com/fcm/send', json=body, headers=headers)
+    cd if resp.status_code!=200:
+        temp = create_resp_dict(False, "Something got wrong")
+        temp['sending_status'] = resp.status_code
+        return JsonResponse(data=temp, safe=False, status=HTTPStatus.OK)
+    temp = create_resp_dict(True, "Notification sent")
+    temp['notification'] = resp.json()
+    return JsonResponse(data=temp, safe=False, status=HTTPStatus.OK)
