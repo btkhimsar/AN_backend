@@ -11,7 +11,7 @@ from Constants.otp import *
 from setup import client
 from util.response import create_resp_dict
 from .models import User
-from .utility import create_user_dict
+from .utility import create_user_dict, create_point_dict
 from category.models import Category
 from .constants import body, headers
 
@@ -63,9 +63,12 @@ def update_profile(request):
                 resp = create_resp_dict(True, USER_UPDATED)
                 for key in user_data:
                     if user_type=='provider':
-                        if key!='name' and key!='mobile' and key!='user_type':
-                            if key=='work_category' and user[str(key)] is not None:
-                                resp['user_details'] = "User's mobile, user_type, work_category, name can't be changed."
+                        if key!='mobile' and key!='user_type':
+                            if key=='base_location':
+                                location = create_point_dict(user_data[key]['latitude'], user_data[key]['longitude'])
+                                user[str(key)] = location
+                            elif key=='work_category' and user[str(key)] is not None:
+                                resp['user_details'] = "User's work_category, name can't be changed."
                             else:
                                 if key=='work_category':
                                     category = Category.objects.get(id=user_data[key])
@@ -73,7 +76,7 @@ def update_profile(request):
                         else:
                             resp['user_details'] = "User's mobile, user_type, name can't be changed."
                     else:
-                        if key!='name' and key!='mobile' and key!='user_type':
+                        if key!='mobile' and key!='user_type':
                             user[str(key)] = user_data[str(key)]
                         else:
                             resp['user_details'] = "User's mobile, user_type, name can't be changed."
@@ -120,10 +123,11 @@ def auth(request):
                 user_type = body_data['user_type']
                 user_language = body_data['user_language']
                 token = body_data['token']
+                active = body_data['active']
                 if user_otp == otp:
                     user_count = User.objects(mobile=mobile)
                     if len(user_count)==0:
-                        user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language, token=token)
+                        user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language, token=token, active=active)
                         user.save()
                         auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile)},
                                                 key=settings.SECRET_KEY,
@@ -147,13 +151,3 @@ def auth(request):
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,
                                     status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
-@api_view(['GET'])
-def notification(request):
-    resp = requests.post('https://fcm.googleapis.com/fcm/send', json=body, headers=headers)
-    if resp.status_code!=200:
-        temp = create_resp_dict(False, "Something got wrong")
-        temp['sending_status'] = resp.status_code
-        return JsonResponse(data=temp, safe=False, status=HTTPStatus.OK)
-    temp = create_resp_dict(True, "Notification sent")
-    temp['notification'] = resp.json()
-    return JsonResponse(data=temp, safe=False, status=HTTPStatus.OK)

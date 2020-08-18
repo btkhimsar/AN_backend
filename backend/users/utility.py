@@ -15,3 +15,7 @@ def create_user_dict(user):
     if len(user.address):
         user_details['address'] = user.address
     return user_details
+
+def create_point_dict(latitude, longitude):
+    point = {'type': 'Point', 'coordinates': [latitude, longitude]}
+    return point

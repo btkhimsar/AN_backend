@@ -32,3 +32,33 @@ def request_json_for_workrequests(request):
     request_data['type'] = 'request'
     request_data['request_id'] = str(request.id)
     return request_data
+
+def header_for_today(ret, language):
+    if language=='english':
+        ret.append({'title': 'Today', 'type': 'header'})
+    elif language=='hindi':
+        ret.append({'title': 'आज', 'type': 'header'})
+
+def footer_for_today(ret, language):
+    if language=='english':
+        ret.append({'title': '120 other requests already completed', 'type': 'footer'})
+    elif language=='hindi':
+        ret.append({'title': '120 अन्य अनुरोध पहले ही पूरे हो चुके हैं', 'type': 'footer'})
+
+def header_for_1dayago(ret, language):
+    if language=='english':
+        ret.append({'title': '1 day ago', 'type': 'header'})
+    elif language=='hindi':
+        ret.append({'title': '1 दिन पहले', 'type': 'header'})
+
+def footer_for_1dayago(ret, language):
+    if language=='english':
+        ret.append({'title': '120 other requests already completed', 'type': 'footer'})
+    elif language=='hindi':
+        ret.append({'title': '120 अन्य अनुरोध पहले ही पूरे हो चुके हैं', 'type': 'footer'})
+
+def location_text(language, len, category):
+    if language=='english':
+        return "{} active requests for {} near".format(len, category.name[language])
+    else:
+        return "निकट {} के लिए {} सक्रिय कार्य अनुरोध".format(category.name[language], len)

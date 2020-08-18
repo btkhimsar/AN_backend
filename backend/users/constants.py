@@ -21,10 +21,8 @@ user_json = {
 }
 
 body = {
-    "to": "cHpkJCAFQwSL937LKTPHD9:APA91bEjerattHR8BgZvueKY1p9DxmTftbGhJlgeayAKA3pmta5EU2YgZKVPB73WelS8RhUy_SEkLfXZ6Jh2LqfPao4j8AymliH7Fl3t4cVm5lQbeHd-lXneAoF4m3qgD3O3sjQpe2bC",
     "priority":"high",
     "notification" :{
-        "body" : "Hello Bro you got a request",
         "title": "India vs. Pakistan",
         "subtitle":"This is Great",
         "android_channel_id": "hello"

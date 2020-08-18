@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, date
 from http import HTTPStatus
+import requests
 
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
@@ -11,8 +12,9 @@ from category.models import Category, SuperCategory
 from users.models import User
 from util.response import create_resp_dict
 from .models import Request
-from .utility import create_point_dict, request_json_for_myrequests, request_json_for_workrequests
-
+from .utility import create_point_dict, request_json_for_myrequests, request_json_for_workrequests, \
+    header_for_today, header_for_1dayago, footer_for_today, footer_for_1dayago, location_text
+from .constants import body, headers
 
 @api_view(['POST'])
 def work_requests(request):
@@ -32,42 +34,29 @@ def work_requests(request):
                 resp_data = create_resp_dict(True, WORK_REQUEST_FETCHED)
                 ret = []
                 user = User.objects.get(id=user_id)
-                work_category = user.work_category
                 user_language = user.user_language
-                category = Category.objects.get(id=work_category)
+                category = Category.objects.get(id=user.work_category)
+                total_workrequests = Request.objects
                 workrequests = Request.objects(
-                    location__geo_within_center=[(location['latitude'], location['longitude']), radius], category_id=work_category)
-                timestamp = date.fromtimestamp(datetime.timestamp(datetime.now()))
-                if user_language=='english':
-                    ret.append({'title': 'Today', 'type': 'header'})
-                elif user_language=='hindi':
-                    ret.append({'title': 'आज', 'type': 'header'})
+                    location__geo_within_center=[(location['latitude'], location['longitude']), radius], category_id=user.work_category, isCompleted=False, isExpired=False)
                 number_of_workrequests = len(workrequests)
-                j = 0
-                for i in range(number_of_workrequests):
-                    if date.fromtimestamp(workrequests[i].created_at) == timestamp:
-                        ret.append(request_json_for_myrequests(workrequests[i]))
-                        j = i
-                    else:
-                        break
-                if user_language=='english':
-                    ret.append({'title': '120 other requests already completed', 'type': 'footer'})
-                elif user_language=='hindi':
-                    ret.append({'title': '120 अन्य अनुरोध पहले ही पूरे हो चुके हैं', 'type': 'footer'})
-                if user_language=='english':
-                    ret.append({'title': '1 day ago', 'type': 'header'})
-                elif user_language=='hindi':
-                    ret.append({'title': '1 दिन पहले', 'type': 'header'})
-                for k in range(j + 1, number_of_workrequests):
-                    ret.append(request_json_for_myrequests(workrequests[k]))
-                if user_language=='english':
-                    ret.append({'title': '120 other requests already completed', 'type': 'footer'})
-                elif user_language=='hindi':
-                    ret.append({'title': '120 अन्य अनुरोध पहले ही पूरे हो चुके हैं', 'type': 'footer'})
-                if user_language=='english':
-                    resp_data['location_text'] = "{} active requests for {} near".format(number_of_workrequests, category.name[user_language])
-                elif user_language=='hindi':
-                    resp_data['location_text'] = "निकट {} के लिए {} सक्रिय कार्य अनुरोध".format(category.name[user_language], number_of_workrequests)
+                if (number_of_workrequests):
+                    header_for_today(ret, user_language)
+                    j = 0
+                    timestamp = date.fromtimestamp(datetime.timestamp(datetime.now()))
+                    for i in range(number_of_workrequests):
+                        if date.fromtimestamp(workrequests[i].created_at) == timestamp:
+                            ret.append(request_json_for_myrequests(workrequests[i]))
+                            j = i
+                        else:
+                            break
+                    footer_for_today(ret, user_language)
+                if (j<number_of_workrequests-1):
+                    header_for_1dayago(ret, user_language)
+                    for k in range(j + 1, number_of_workrequests):
+                        ret.append(request_json_for_myrequests(workrequests[k]))
+                    footer_for_1dayago(ret, user_language)
+                resp_data['location_text'] = location_text(user_language, len(total_workrequests)-number_of_workrequests, category)
                 resp_data['location_subtext'] = LOCATIONS_SUBTEXT
                 resp_data['workrequests'] = ret
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
@@ -90,21 +79,24 @@ def my_request(request):
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
                 ret = []
-                timestamp = date.fromtimestamp(datetime.timestamp(datetime.now()))
                 requests = Request.objects(user_id=user_id)
+                user = User.objects.get(id=user_id)
                 resp_data = create_resp_dict(True, REQUEST_FETCHED)
-                ret.append({'title': 'Today', 'type': 'header'})
                 number_of_requests = len(requests)
-                j = 0
-                for i in range(number_of_requests):
-                    if date.fromtimestamp(requests[i].created_at) == timestamp:
-                        ret.append(request_json_for_myrequests(requests[i]))
-                        j=i
-                    else:
-                        break
-                ret.append({'title': '1 day ago', 'type': 'header'})
-                for k in range(j+1, number_of_requests):
-                    ret.append(request_json_for_myrequests(requests[k]))
+                if number_of_requests:
+                    header_for_today(ret, user.user_language)
+                    j = 0
+                    timestamp = date.fromtimestamp(datetime.timestamp(datetime.now()))
+                    for i in range(number_of_requests):
+                        if date.fromtimestamp(requests[i].created_at) == timestamp:
+                            ret.append(request_json_for_myrequests(requests[i]))
+                            j=i
+                        else:
+                            break
+                if j<number_of_requests-1:
+                    ret.append({'title': '1 day ago', 'type': 'header'})
+                    for k in range(j+1, number_of_requests):
+                        ret.append(request_json_for_myrequests(requests[k]))
                 resp_data['myrequests'] = ret
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
             except Exception as e:
@@ -133,6 +125,9 @@ def job(request):
                 customer = User.objects.get(id=user_id)
                 category = Category.objects.get(id=category_id)
                 super_category = SuperCategory.objects.get(id=super_category_id)
+                users = User.objects(
+                    location__geo_within_center=[(location['latitude'], location['longitude']), 0.095],
+                    user_type='provider', work_category=category_id, active=True)
                 location = create_point_dict(location['latitude'], location['longitude'])
                 request = Request(category_id=category_id, location=location, user_id=user_id,
                                   mobile=customer.mobile, location_name=location_name, super_category_id=super_category_id)
@@ -143,6 +138,11 @@ def job(request):
                 request.save()
                 resp_data = create_resp_dict(True, REQUEST_CREATED)
                 resp_data['requestId'] = str(request.id)
+                for user in users:
+                    body['to'] = user.token
+                    body['notification']['body'] = '{} from {} requested for your service'.format(user.name, location_name)
+                    temp = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, json=body)
+                resp_data['notification'] = "Notification sent successfully to all the providers within a range of 10 kms"
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,

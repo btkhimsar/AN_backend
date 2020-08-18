@@ -12,10 +12,11 @@ class User(Document):
     address = fields.StringField(max_length=300, default="")
     user_language = fields.StringField(choices=LANGS, required=True, default='english')
     profile_image = fields.URLField(default=HOME_ICON)
-    base_location = fields.StringField(max_length=500, required=False)
+    location = fields.PointField(required=False)
     user_type = fields.StringField(choices=USER_TYPE, default="consumer", required=False)
     work_radius = fields.IntField(min_value=3, max_value=10, required=False)
     work_category = fields.StringField(min_value=1, max_length=100, required=False)
     token = fields.StringField(required=True, default="")
+    active = fields.BooleanField(default=True)
 
     meta = {"db_alias": "default"}
