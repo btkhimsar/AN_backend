@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from Constants.response_strings import SUBCATEGORY_ADDED, CATEGORY_ADDED, DATA_FETCHED, INCORRECT_REQUEST
 from setup import client
 from util.response import create_resp_dict
+from .constants import data
 from .models import Category, SuperCategory
 from .helpers import request_json
 
@@ -87,3 +88,6 @@ def handle_super_category(request):
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
+@api_view(['GET'])
+def questions(request):
+    return JsonResponse(data=data, safe=False, status=HTTPStatus.OK)

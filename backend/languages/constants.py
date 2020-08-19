@@ -144,3 +144,23 @@ data = {
         'once_you_confirm': 'एक बार जब आप पास के श्रमिकों की पुष्टि करते हैं, तो आपकी आवश्यकता पर चर्चा करने के लिए आपसे संपर्क करेंगे'
     }
 }
+view_more = {
+        "english": {
+            "you_are_looking_for": "You are looking for",
+            "upto_distance": "Upto Distance",
+            "yes": "Yes",
+            "no": "No",
+            "sure_you_want_to_mark_this_work_as_done": "Sure?You Want to mark this work as done",
+            "provider": "Provider",
+            "consumer": "Consumer"
+        },
+        "hindi": {
+            "you_are_looking_for": "आप क्या देख रहे हैं",
+            "upto_distance": "तक की दूरी",
+            "yes": "हाँ",
+            "no": "नहीं",
+            "sure_you_want_to_mark_this_work_as_done": "सुनिश्चित करें? आप इस काम को चिह्नित करना चाहते हैं",
+            "provider": "प्रदाता",
+            "consumer": "उपभोक्ता"
+        }
+    }

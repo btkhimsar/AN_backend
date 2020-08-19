@@ -8,7 +8,7 @@ from Constants.response_strings import *
 from languages.models import Language
 from setup import client
 from util.response import create_resp_dict
-from .constants import data
+from .constants import data, view_more
 
 @api_view(['POST'])
 def add_language(request):
@@ -61,9 +61,11 @@ def language_data(request):
                 if user_language=='english':
                     resp = create_resp_dict(True, DATA_FETCHED)
                     resp['user_language'] = data['english']
+                    resp['view_more'] = view_more['english']
                 elif user_language=='hindi':
                     resp = create_resp_dict(True, DATA_FETCHED)
                     resp['user_language'] = data['hindi']
+                    resp['view_more'] = view_more['english']
                 else:
                     resp = create_resp_dict(False, LANGUAGE_NOT_AVAILABLE)
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
