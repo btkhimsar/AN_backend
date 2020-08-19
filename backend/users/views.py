@@ -58,14 +58,14 @@ def update_profile(request):
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
                 user_data = body_data['user']
-                user = User.objects(id=user_id).first()
+                user = User.objects.get(id=user_id)
                 user_type = user.user_type
                 resp = create_resp_dict(True, USER_UPDATED)
                 for key in user_data:
                     if user_type=='provider':
                         if key!='mobile' and key!='user_type':
                             if key=='base_location':
-                                location = create_point_dict(user_data[key]['latitude'], user_data[key]['longitude'])
+                                location = create_point_dict(user_data[str(key)]['latitude'], user_data[str(key)]['longitude'])
                                 user[str(key)] = location
                             elif key=='work_category' and user[str(key)] is not None:
                                 resp['user_details'] = "User's work_category, name can't be changed."
@@ -108,6 +108,7 @@ def profile(request):
                                     status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
+
 @api_view(['POST'])
 def auth(request):
     if request.method == 'POST':
@@ -123,11 +124,10 @@ def auth(request):
                 user_type = body_data['user_type']
                 user_language = body_data['user_language']
                 token = body_data['token']
-                active = body_data['active']
                 if user_otp == otp:
                     user_count = User.objects(mobile=mobile)
                     if len(user_count)==0:
-                        user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language, token=token, active=active)
+                        user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language, token=token)
                         user.save()
                         auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile)},
                                                 key=settings.SECRET_KEY,

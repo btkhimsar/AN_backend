@@ -58,7 +58,6 @@ def language_data(request):
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
                 user_language = body_data['user_language'].lower()
-                # resp = create_resp_dict(True, DATA_FETCHED)
                 if user_language=='english':
                     resp = create_resp_dict(True, DATA_FETCHED)
                     resp['user_language'] = data['english']

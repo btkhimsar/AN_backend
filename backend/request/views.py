@@ -126,7 +126,7 @@ def job(request):
                 category = Category.objects.get(id=category_id)
                 super_category = SuperCategory.objects.get(id=super_category_id)
                 users = User.objects(
-                    location__geo_within_center=[(location['latitude'], location['longitude']), 0.095],
+                    base_location__geo_within_center=[(location['latitude'], location['longitude']), 0.095],
                     user_type='provider', work_category=category_id, active=True)
                 location = create_point_dict(location['latitude'], location['longitude'])
                 request = Request(category_id=category_id, location=location, user_id=user_id,
