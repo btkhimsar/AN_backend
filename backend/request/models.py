@@ -1,7 +1,9 @@
-from mongoengine import Document, fields
+from mongoengine import Document, fields, EmbeddedDocument
 
-from datetime import datetime
-
+class Question(EmbeddedDocument):
+    qId = fields.IntField()
+    aId = fields.ListField(fields.IntField())
+    remarks = fields.StringField(max_length=100, default="")
 
 class Request(Document):
     category_id = fields.StringField(required=True, max_length=50)
@@ -18,5 +20,6 @@ class Request(Document):
     isExpired = fields.BooleanField(default=False)
     provider_id = fields.StringField(max_length=300)
     complaints = fields.ListField(fields.StringField())
+    questions = fields.EmbeddedDocumentListField(Question)
 
     meta = {"db_alias": "default"}

@@ -69,7 +69,16 @@ data = {
         'maid': 'Maid',
         'you_recive': 'You will recive work requests in nearby location for',
         'confirm': 'Confirm',
-        'once_you_confirm': 'Once you confirm nearby workers will contact you on phone to discuss your requirement'
+        'once_you_confirm': 'Once you confirm nearby workers will contact you on phone to discuss your requirement',
+        'view_more': {
+            "you_are_looking_for": "You are looking for",
+            "upto_distance": "Upto Distance",
+            "yes": "Yes",
+            "no": "No",
+            "sure_you_want_to_mark_this_work_as_done": "Sure?You Want to mark this work as done",
+            "provider": "Provider",
+            "consumer": "Consumer"
+        }
     },
     'hindi': {
         'app_name': 'आतमनिर्भर',
@@ -141,20 +150,8 @@ data = {
         'maid': 'नौकरानी',
         'you_recive': 'आप आस-पास के स्थान के लिए कार्य अनुरोधों को पुनः प्राप्त करेंगे',
         'confirm': 'पुष्टि करें',
-        'once_you_confirm': 'एक बार जब आप पास के श्रमिकों की पुष्टि करते हैं, तो आपकी आवश्यकता पर चर्चा करने के लिए आपसे संपर्क करेंगे'
-    }
-}
-view_more = {
-        "english": {
-            "you_are_looking_for": "You are looking for",
-            "upto_distance": "Upto Distance",
-            "yes": "Yes",
-            "no": "No",
-            "sure_you_want_to_mark_this_work_as_done": "Sure?You Want to mark this work as done",
-            "provider": "Provider",
-            "consumer": "Consumer"
-        },
-        "hindi": {
+        'once_you_confirm': 'एक बार जब आप पास के श्रमिकों की पुष्टि करते हैं, तो आपकी आवश्यकता पर चर्चा करने के लिए आपसे संपर्क करेंगे',
+        'view_more': {
             "you_are_looking_for": "आप क्या देख रहे हैं",
             "upto_distance": "तक की दूरी",
             "yes": "हाँ",
@@ -164,3 +161,4 @@ view_more = {
             "consumer": "उपभोक्ता"
         }
     }
+}

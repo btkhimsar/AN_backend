@@ -17,6 +17,11 @@ WORK_REQUEST_FETCHED = "Work Requests Fetched Successfully"
 LOCATIONS_TEXT = "DUMMY COUNT LOCATIONS TEXT"
 LOCATIONS_SUBTEXT = "DUMMY COUNT LOCATIONS SUB TEXT"
 LANGUAGE_NOT_AVAILABLE = "Language Not Available"
+QUESTION_CREATED = "Question Added Successfully"
+ANSWER_ADDED = "Answer Added Successfully"
+SUBQUESTION_ADDED = "SubQuestion Added Successfully"
+SUBANSWER_ADDED = "SubAnswer Added Successfully"
+QUESTION_FETCHED = "Questions Fetched Successfully"
 RESPONSE = {
     'isSuccess': False
 }
