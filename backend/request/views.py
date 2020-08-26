@@ -24,7 +24,6 @@ def work_requests(request):
                                 status=HTTPStatus.BAD_REQUEST)
         else:
             try:
-                print(client)
                 body_data = json.loads(request.body.decode('utf-8'))
                 # todo verify auth token
                 auth_token = body_data['auth_token']
@@ -38,7 +37,7 @@ def work_requests(request):
                 category = Category.objects.get(id=user.work_category)
                 total_workrequests = Request.objects
                 workrequests = Request.objects(
-                    location__geo_within_center=[(location['latitude'], location['longitude']), radius], category_id=user.work_category, isCompleted=False, isExpired=False)
+                    location__geo_within_center=[(location['latitude'], location['longitude']), radius], category_id=user.work_category, isCompleted=False, isExpired=False).order_by('-created_at')
                 number_of_workrequests = len(workrequests)
                 if (number_of_workrequests):
                     header_for_today(ret, user_language)
@@ -79,7 +78,7 @@ def my_request(request):
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
                 ret = []
-                requests = Request.objects(user_id=user_id)
+                requests = Request.objects(user_id=user_id).order_by('-created_at')
                 user = User.objects.get(id=user_id)
                 resp_data = create_resp_dict(True, REQUEST_FETCHED)
                 number_of_requests = len(requests)

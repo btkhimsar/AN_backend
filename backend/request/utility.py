@@ -6,7 +6,6 @@ def create_point_dict(latitude, longitude):
     point = {'type': 'Point', 'coordinates': [latitude, longitude]}
     return point
 
-
 def request_json_for_myrequests(request):
     request_data = {}
     user = User.objects.get(id=request.user_id)
@@ -32,6 +31,7 @@ def request_json_for_workrequests(request):
     request_data['type'] = 'request'
     request_data['request_id'] = str(request.id)
     return request_data
+
 
 def header_for_today(ret, language):
     if language=='english':

@@ -96,7 +96,6 @@ def profile(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 # todo verify auth token
                 auth_token = body_data['auth_token']
-
                 user_id = body_data['user_id']
                 user = User.objects(id=user_id).first()
                 user_details = create_user_dict(user)
@@ -121,12 +120,12 @@ def auth(request):
                 mobile = body_data['mobile']
                 user_otp = body_data['user_otp']
                 name = body_data['name']
-                user_type = body_data['user_type']
                 user_language = body_data['user_language']
                 token = body_data['token']
                 if user_otp == otp:
                     user_count = User.objects(mobile=mobile)
                     if len(user_count)==0:
+                        user_type = body_data['user_type']
                         user = User(mobile=mobile, name=name, user_type=user_type, user_language=user_language, token=token)
                         user.save()
                         auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile)},
@@ -142,6 +141,7 @@ def auth(request):
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = str(user_count[0].id)
+                        resp_data['user_details'] = create_user_dict(user_count[0])
                         resp_data['user_exists'] = "User's name, user_type can't be changed."
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
                 else:
