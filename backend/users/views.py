@@ -142,6 +142,8 @@ def auth(request):
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = str(user_count[0].id)
                         resp_data['user_details'] = create_user_dict(user_count[0])
+                        if user_count[0].work_category is not None:
+                            resp_data['user_details']['work_category_id'] = str(user_count[0].work_category)
                         resp_data['user_exists'] = "User's name, user_type can't be changed."
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
                 else:
