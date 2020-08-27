@@ -1,7 +1,7 @@
 from mongoengine import Document, fields, EmbeddedDocument
 
 class Question(EmbeddedDocument):
-    qId = fields.IntField()
+    qId = fields.StringField()
     aId = fields.ListField(fields.IntField())
     remarks = fields.StringField(max_length=100, default="")
 

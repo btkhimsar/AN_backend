@@ -39,13 +39,13 @@ def work_requests(request):
                 workrequests = Request.objects(
                     location__geo_within_center=[(location['latitude'], location['longitude']), radius], category_id=user.work_category, isCompleted=False, isExpired=False).order_by('-created_at')
                 number_of_workrequests = len(workrequests)
+                j = 0
                 if (number_of_workrequests):
                     header_for_today(ret, user_language)
-                    j=0
                     timestamp = date.fromtimestamp(datetime.timestamp(datetime.now()))
                     for i in range(number_of_workrequests):
                         if date.fromtimestamp(workrequests[i].created_at) == timestamp:
-                            ret.append(request_json_for_workrequests(workrequests[i]))
+                            ret.append(request_json_for_workrequests(workrequests[i], user_language))
                             j = i
                         else:
                             break
@@ -53,7 +53,7 @@ def work_requests(request):
                 if (j<number_of_workrequests-1):
                     header_for_1dayago(ret, user_language)
                     for k in range(j + 1, number_of_workrequests):
-                        ret.append(request_json_for_workrequests(workrequests[k]))
+                        ret.append(request_json_for_workrequests(workrequests[k], user_language))
                     footer_for_1dayago(ret, user_language)
                 resp_data['location_text'] = location_text(user_language, len(total_workrequests)-number_of_workrequests, category)
                 resp_data['location_subtext'] = LOCATIONS_SUBTEXT

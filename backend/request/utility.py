@@ -1,5 +1,5 @@
 from Constants.image_urls import HOME_ICON
-from category.models import Category, SuperCategory
+from category.models import Category, SuperCategory, Question
 from users.models import User
 
 def create_point_dict(latitude, longitude):
@@ -21,7 +21,7 @@ def request_json_for_myrequests(request):
     request_data['request_id'] = str(request.id)
     return request_data
 
-def request_json_for_workrequests(request):
+def request_json_for_workrequests(request, user_language):
     request_data = {}
     user = User.objects.get(id=request.user_id)
     request_data['title'] = 'Request from {}'.format(user.name)
@@ -30,8 +30,19 @@ def request_json_for_workrequests(request):
     request_data['mobile'] = request.mobile
     request_data['type'] = 'request'
     request_data['request_id'] = str(request.id)
+    request_data['questions'] = []
+    if len(request.questions):
+        for i in request.questions:
+            data = {}
+            question = Question.objects.get(id=i.qId)
+            data['qText'] = question.text[user_language]
+            data['aText'] = []
+            for j in i.aId:
+                answer = question.answers.filter(answer_id=j)[0]
+                data['aText'].append(answer.text[user_language])
+            data['remarks'] = i.remarks
+            request_data['questions'].append(data)
     return request_data
-
 
 def header_for_today(ret, language):
     if language=='english':

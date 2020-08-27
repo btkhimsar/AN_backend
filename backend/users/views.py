@@ -131,6 +131,7 @@ def auth(request):
                         auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile)},
                                                 key=settings.SECRET_KEY,
                                                 algorithm='HS256')
+                        # print(jwt.decode(auth_token), 'settings.SECRET_KEY', algorithms=['HS256'])
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = str(user.id)
@@ -138,6 +139,9 @@ def auth(request):
                         auth_token = jwt.encode(payload={'id': str(user_count[0].id), 'num': str(user_count[0].mobile)},
                                                 key=settings.SECRET_KEY,
                                                 algorithm='HS256')
+                        decoded = jwt.decode(auth_token, 'settings.SECRET_KEY', algorithms='HS256', verify=False)
+                        print(decoded)
+                        print(jwt.get_unverified_header(auth_token))
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = str(user_count[0].id)
