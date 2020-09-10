@@ -12,7 +12,7 @@ def create_point_dict(latitude, longitude):
 
 def request_json_for_myrequest(my_request, category, super_category, user_language):
     request_data = {'subtitle': '{} > {}'.format(super_category.name[user_language],
-                                                 category.name[user_language]), 'isCompleted': my_request.isCompleted,
+                    category.name[user_language]), 'isCompleted': my_request.isCompleted,
                     'request_id': str(my_request.id)}
     if user_language == 'english':
         request_data['title'] = "You requested for"
@@ -21,7 +21,7 @@ def request_json_for_myrequest(my_request, category, super_category, user_langua
     return request_data
 
 
-def request_json_for_workrequest(work_request, user_language):
+def request_json_for_workrequest(work_request):
     user_name = User.objects.get(id=work_request.user_id).name
     request_data = {'title': 'Request from {}'.format(user_name), 'subtitle': work_request.location_name,
                     'subtitle_icon': HOME_ICON, 'mobile': work_request.mobile, 'type': 'request',
@@ -126,7 +126,7 @@ def work_requests_list(fetched_requests, user_language):
         header_for_today(requests_list, user_language)
         for request in fetched_requests:
             if date.fromtimestamp(request.created_at) == today_date():
-                request_obj = request_json_for_workrequest(request, user_language)
+                request_obj = request_json_for_workrequest(request)
                 requests_list.append(request_obj)
                 requests_count += 1
                 remaining_requests = requests_count

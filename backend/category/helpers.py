@@ -7,7 +7,7 @@ def categories_dict(categories_list):
 
 def request_json_for_category(category, user_language):
     request_data = {'category_id': str(category.id), 'name': category.name[user_language],
-                    'icon_url': category.icon_url}
+                    'icon_url': category.icon_url, 'has_questions': category.has_questions}
     return request_data
 
 
