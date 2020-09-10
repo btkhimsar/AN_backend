@@ -1,12 +1,9 @@
 body = {
-    "priority":"high",
-    "notification" :{
-        "title": "You got a new request"
-    },
     "data": {
         "tag_notification" : "700",
         "tag_call" : "400",
-        "tag_ignore": "600"
+        "tag_ignore": "600",
+        "priority":"high"
     }
 }
 

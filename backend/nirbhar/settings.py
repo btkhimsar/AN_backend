@@ -73,7 +73,9 @@ INSTALLED_APPS = [
     'category.apps.CategoryConfig',
     'users.apps.UsersConfig',
     'request.apps.RequestConfig',
+    # 'question.apps.QuestionConfig'
     'rest_framework',
+    'rest_framework_mongoengine'
     # 'corsheaders',
 ]
 
