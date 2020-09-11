@@ -112,7 +112,7 @@ def my_requests_list_func(fetched_requests, categories, super_categories, user_l
         header_for_1dayago(requests_list, user_language)
         for count in range(remaining_requests+1, total_requests):
             request_obj = request_json_for_myrequest(fetched_requests[count], categories[fetched_requests[count].category_id],
-                                                     super_categories[request[count].super_category_id], user_language)
+                                                     super_categories[fetched_requests[count].super_category_id], user_language)
             requests_list.append(request_obj)
     return requests_list
 
@@ -136,7 +136,7 @@ def work_requests_list(fetched_requests, user_language):
     if remaining_requests < (total_requests - 1):
         header_for_1dayago(requests_list, user_language)
         for count in range(remaining_requests + 1, total_requests):
-            request_obj = request_json_for_workrequest(fetched_requests[count], user_language)
+            request_obj = request_json_for_workrequest(fetched_requests[count])
             requests_list.append(request_obj)
         footer_for_1dayago(requests_list, user_language)
     return requests_list

@@ -76,12 +76,12 @@ def update_profile(request):
                                     category = Category.objects.get(id=user_data[key])
                                 user[key] = user_data[key]
                         else:
-                            resp['user_details'] = "User's mobile number, user_type can't be changed."
+                            resp['user_details'] = "User's user_type can't be changed."
                     else:
                         if key != 'mobile' and key != 'user_type':
-                            user[str(key)] = user_data[str(key)]
+                            user[key] = user_data[key]
                         else:
-                            resp['user_details'] = "User's mobile, user_type, name can't be changed."
+                            resp['user_details'] = "User's user_type, name can't be changed."
                 user.save()
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
