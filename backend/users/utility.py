@@ -1,3 +1,6 @@
+import datetime
+import jwt
+from django.conf import settings
 from category.models import Category
 
 
@@ -16,6 +19,13 @@ def create_user_dict(user):
     if user.address:
         user_details['address'] = user.address
     return user_details
+
+
+def generate_auth_token(user):
+    request_auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile),
+                        'exp': datetime.datetime.utcnow() + datetime.timedelta(
+                        minutes=2)}, key=settings.SECRET_KEY, algorithm='HS256')
+    return request_auth_token
 
 
 def create_point_dict(latitude, longitude):

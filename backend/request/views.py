@@ -6,12 +6,13 @@ from rest_framework.decorators import api_view
 from Constants.response_strings import *
 from category.models import Category, SuperCategory
 from users.models import User
-from util.response import create_resp_dict
+from util.response import create_resp_dict, token_required
 from .models import Request
 from .utility import *
 
 
 @api_view(['POST'])
+@token_required
 def work_requests(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
@@ -46,6 +47,7 @@ def work_requests(request):
 
 
 @api_view(['POST'])
+@token_required
 def my_requests(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
@@ -80,6 +82,7 @@ def my_requests(request):
 
 
 @api_view(['POST'])
+@token_required
 def create_request(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
@@ -130,6 +133,7 @@ def create_request(request):
 
 
 @api_view(['POST'])
+@token_required
 def my_request_update(request):
     if request.method=='POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:

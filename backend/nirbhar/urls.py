@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^', include('users.urls')),
     url(r'^', include('category.urls')),
     url(r'^', include('request.urls')),
-    url(r'^', include('languages.urls'))
+    url(r'^', include('languages.urls')),
+    url(r'^', include('question.urls'))
 ]

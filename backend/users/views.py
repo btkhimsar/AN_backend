@@ -1,12 +1,10 @@
 import json
 from http import HTTPStatus
-import jwt
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
-from django.conf import settings
 from Constants.response_strings import *
 from Constants.otp import *
-from util.response import create_resp_dict
+from util.response import create_resp_dict, token_required
 from .models import User
 from .utility import *
 from category.models import Category
@@ -44,6 +42,7 @@ def login(request):
 
 
 @api_view(['POST'])
+@token_required
 def update_profile(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
@@ -81,7 +80,7 @@ def update_profile(request):
                         if key != 'mobile' and key != 'user_type':
                             user[key] = user_data[key]
                         else:
-                            resp['user_details'] = "User's user_type, name can't be changed."
+                            resp['user_details'] = "User's user_type can't be changed."
                 user.save()
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
@@ -91,6 +90,7 @@ def update_profile(request):
 
 
 @api_view(['POST'])
+@token_required
 def profile(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
@@ -140,17 +140,15 @@ def auth(request):
                                         user_language=user_language, token=token)
                         new_user.save()
 
-                        auth_token = jwt.encode(payload={'id': str(new_user.id), 'num': str(new_user.mobile)},
-                                                key=settings.SECRET_KEY,
-                                                algorithm='HS256')
+                        auth_token = generate_auth_token(new_user)
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = str(new_user.id)
 
                     else:
-                        auth_token = jwt.encode(payload={'id': str(user[0].id), 'num': str(user[0].mobile)},
-                                                key=settings.SECRET_KEY, algorithm='HS256')
+
+                        auth_token = generate_auth_token(user[0])
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
