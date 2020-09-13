@@ -43,12 +43,11 @@ def add_answer(request):
         else:
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
-                answer_id = body_data['answer_id']
                 text = body_data['text']
-                question_id = body_data['question_id']
+                qId = body_data['qId']
 
-                question = Question.objects.get(id=question_id)
-                answer = Answer(answer_id=answer_id)
+                question = Question.objects.get(id=qId)
+                answer = Answer()
 
                 for language in text:
                     answer.text[language] = text[language]
@@ -71,21 +70,20 @@ def add_sub_question(request):
         else:
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
-                sub_question_id = body_data['sub_question_id']
-                sub_question_type = body_data['sub_question_type']
+                question_type = body_data['question_type']
                 text = body_data['text']
                 isMandatory = body_data['isMandatory']
                 answer_id = body_data['answer_id']
-                question_id = body_data['question_id']
+                qId = body_data['qId']
 
-                question = Question.objects.get(id=question_id)
+                question = Question.objects.get(id=qId)
                 answer = question.answers.filter(answer_id=answer_id)[0]
-                sub_question = SubQuestion(sub_question_id=sub_question_id, sub_question_type=sub_question_type,
+                sub_question = SubQuestion(question_type=question_type,
                                            isMandatory=isMandatory)
 
                 for language in text:
                     sub_question.text[language] = text[language]
-                answer.sub_questions.append(sub_question)
+                answer.questions.append(sub_question)
                 question.save()
                 return JsonResponse(data=create_resp_dict(True, SUBQUESTION_ADDED), safe=False,
                                     status=HTTPStatus.OK)
@@ -104,20 +102,19 @@ def add_sub_answer(request):
         else:
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
-                sub_answer_id = body_data['sub_answer_id']
                 text = body_data['text']
-                sub_question_id = body_data['sub_question_id']
-                answer_id = body_data['answer_id']
                 question_id = body_data['question_id']
+                answer_id = body_data['answer_id']
+                qId = body_data['qId']
 
-                question = Question.objects.get(id=question_id)
+                question = Question.objects.get(id=qId)
                 answer = question.answers.filter(answer_id=answer_id)[0]
-                sub_question = answer.sub_questions.filter(sub_question_id=sub_question_id)[0]
-                sub_answer = SubAnswer(sub_answer_id=sub_answer_id)
+                sub_question = answer.questions.filter(question_id=question_id)[0]
+                sub_answer = SubAnswer()
 
                 for language in text:
                     sub_answer.text[language] = text[language]
-                sub_question.sub_answers.append(sub_answer)
+                sub_question.answers.append(sub_answer)
                 question.save()
                 return JsonResponse(data=create_resp_dict(True, SUBANSWER_ADDED), safe=False,
                                     status=HTTPStatus.OK)
