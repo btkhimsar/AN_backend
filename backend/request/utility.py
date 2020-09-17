@@ -1,6 +1,5 @@
-from Constants.image_urls import HOME_ICON
 import requests
-from .constants import body, headers
+from .constants import body, headers, get_month
 from datetime import datetime, date
 from users.models import User
 
@@ -10,51 +9,33 @@ def create_point_dict(latitude, longitude):
     return point
 
 
-def request_json_for_myrequest(my_request, category, super_category, user_language):
-    request_data = {'subtitle': '{} > {}'.format(super_category.name[user_language],
-                    category.name[user_language]), 'isCompleted': my_request.isCompleted,
-                    'request_id': str(my_request.id)}
-    if user_language == 'english':
-        request_data['title'] = "You requested for"
-    elif user_language == 'hindi':
-        request_data['title'] = 'आपने निवेदन किया'
+def request_json_for_myrequest(my_request, category, user_language):
+    request_data = {'type': 'request', 'title': category.name[user_language], 'isCompleted': my_request.isCompleted,
+                    'request_id': my_request._id, 'expiry_text': 'Expires in 7 days'}
     return request_data
 
 
-def request_json_for_workrequest(work_request):
-    user_name = User.objects.get(id=work_request.user_id).name
-    request_data = {'title': 'Request from {}'.format(user_name), 'subtitle': work_request.location_name,
-                    'subtitle_icon': HOME_ICON, 'mobile': work_request.mobile, 'type': 'request',
-                    'request_id': str(work_request.id), 'questions': []}
+def request_json_for_workrequest(work_request, user_language):
+    user = User.objects.get(_id=work_request.user_id)
+    request_data = {'title': work_request.location_name, 'image_url': user.profile_image, 'mobile': work_request.mobile,
+                    'type': 'request', 'name': user.name, 'request_id': work_request._id}
+    get_date = convert_timestamps(work_request.created_at)
+    request_data['created_date'] = str(get_date.day) + ' ' + str(get_month[get_date.month][user_language])
     return request_data
 
 
-def header_for_today(work_request_list, language):
+def header_for_ongoing_requests(requests_list, language):
     if language == 'english':
-        work_request_list.append({'title': 'Today', 'type': 'header'})
+        requests_list.append({'title': 'Ongoing Requests', 'type': 'header'})
     elif language == 'hindi':
-        work_request_list.append({'title': 'आज', 'type': 'header'})
+        requests_list.append({'title': 'चल रहे अनुरोध', 'type': 'header'})
 
 
-def footer_for_today(work_request_list, language):
+def header_for_other_requests(requests_list, language):
     if language == 'english':
-        work_request_list.append({'title': '120 other requests already completed', 'type': 'footer'})
+        requests_list.append({'title': 'Other Requests', 'type': 'header'})
     elif language == 'hindi':
-        work_request_list.append({'title': '120 अन्य अनुरोध पहले ही पूरे हो चुके हैं', 'type': 'footer'})
-
-
-def header_for_1dayago(work_request_list, language):
-    if language == 'english':
-        work_request_list.append({'title': '1 day ago', 'type': 'header'})
-    elif language == 'hindi':
-        work_request_list.append({'title': '1 दिन पहले', 'type': 'header'})
-
-
-def footer_for_1dayago(work_request_list, language):
-    if language == 'english':
-        work_request_list.append({'title': '120 other requests already completed', 'type': 'footer'})
-    elif language == 'hindi':
-        work_request_list.append({'title': '120 अन्य अनुरोध पहले ही पूरे हो चुके हैं', 'type': 'footer'})
+        requests_list.append({'title': 'अन्य अनुरोध', 'type': 'header'})
 
 
 def location_text(language, isCompleted_requests, category):
@@ -91,52 +72,75 @@ def today_date():
     return date.fromtimestamp(today_timestamp)
 
 
-def my_requests_list_func(fetched_requests, categories, super_categories, user_language):
-    requests_list = []
-    total_requests = len(fetched_requests)
-    requests_count = 0
-    remaining_requests = 0
-    if total_requests:
-        header_for_today(requests_list, user_language)
-        for request in fetched_requests:
-            if date.fromtimestamp(request.created_at) == today_date():
-                request_obj = request_json_for_myrequest(request, categories[request.category_id],
-                                                         super_categories[request.super_category_id], user_language)
-                requests_list.append(request_obj)
-                requests_count += 1
-                remaining_requests = requests_count
-            else:
-                break
+def convert_timestamps(timestmp):
+    return date.fromtimestamp(timestmp)
 
-    if remaining_requests < (total_requests-1):
-        header_for_1dayago(requests_list, user_language)
-        for count in range(remaining_requests+1, total_requests):
-            request_obj = request_json_for_myrequest(fetched_requests[count], categories[fetched_requests[count].category_id],
-                                                     super_categories[fetched_requests[count].super_category_id], user_language)
-            requests_list.append(request_obj)
-    return requests_list
+
+def my_requests_list_func(fetched_requests, categories, user_language):
+    ongoing_requests = []
+    other_requests = []
+
+    if len(ongoing_requests):
+        header_for_ongoing_requests(ongoing_requests, user_language)
+
+        for request in fetched_requests:
+            get_date = convert_timestamps(request.created_at)
+            diff = get_date - today_date()
+
+            request_obj = request_json_for_myrequest(request, categories[request.category_id], user_language)
+            request_obj['subtitle'] = str(get_date.day) + ' ' + str(get_month[get_date.month][user_language])
+
+            if diff.days <= 7 and (request.isCompleted == False):
+                ongoing_requests.append(request_obj)
+            else:
+                if len(other_requests) == 0:
+                    header_for_other_requests(other_requests, user_language)
+                other_requests.append(request_obj)
+
+    return ongoing_requests + other_requests
 
 
 def work_requests_list(fetched_requests, user_language):
     requests_list = []
-    total_requests = len(fetched_requests)
-    requests_count = 0
-    remaining_requests = 0
-    if total_requests:
-        header_for_today(requests_list, user_language)
-        for request in fetched_requests:
-            if date.fromtimestamp(request.created_at) == today_date():
-                request_obj = request_json_for_workrequest(request)
-                requests_list.append(request_obj)
-                requests_count += 1
-                remaining_requests = requests_count
-            else:
-                break
-        footer_for_today(requests_list, user_language)
-    if remaining_requests < (total_requests - 1):
-        header_for_1dayago(requests_list, user_language)
-        for count in range(remaining_requests + 1, total_requests):
-            request_obj = request_json_for_workrequest(fetched_requests[count])
-            requests_list.append(request_obj)
-        footer_for_1dayago(requests_list, user_language)
+    for request in fetched_requests:
+        request_obj = request_json_for_workrequest(request, user_language)
+        requests_list.append(request_obj)
     return requests_list
+
+
+def get_questions_dict(questions):
+    questions_dict = {}
+    for question in questions:
+        questions_dict[question.id] = question
+    return questions_dict
+
+
+def request_json_for_question(ques_obj, question, user_language):
+    request_data = {'title': ques_obj.text[user_language], 'subtitle': ''}
+    for ans_id in question.aId:
+        ans_obj = ques_obj.answers.filter(answer_id=ans_id)
+        request_data['subtitle'] += ans_obj.text[user_language] + " . "
+    return request_data
+
+
+def get_questions(questions, questions_dict, user_language):
+    questions_list = []
+    for question in questions:
+        ques_obj = questions_dict[question['qId']]
+        questions_list.append(request_json_for_question(ques_obj, question, user_language))
+
+    return questions_list
+
+
+def request_json_for_user(user):
+    request_data = {'profile_image': user.profile_image, 'name': user.name,
+                    'user_id': user._id, 'mobile': user.mobile}
+    return request_data
+
+
+def get_user_details(users_list):
+    users_details_list = []
+    for user in users_list:
+        user_obj = request_json_for_user(user)
+        users_details_list.append(user_obj)
+    return users_details_list

@@ -18,7 +18,8 @@ def token_required(f):
                                 status=HTTPStatus.BAD_REQUEST)
         try:
             data = jwt.decode(auth_token, key=settings.SECRET_KEY, leeway=20, algorithms=['HS256'])
-            if body_data['user_id'] == data['id']:
+
+            if str(body_data['user_id']) == data['id']:
                 return f(request)
         except Exception as e:
             return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)

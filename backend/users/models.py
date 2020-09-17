@@ -5,6 +5,7 @@ from Constants.user_type import USER_TYPE
 
 
 class User(Document):
+    _id = fields.LongField(primary_key=True)
     mobile = fields.StringField(max_length=10, required=True)
     name = fields.StringField(max_length=30, required=True)
     user_type = fields.StringField(choices=USER_TYPE, required=True, default="consumer")
@@ -17,5 +18,6 @@ class User(Document):
     work_radius = fields.IntField(min_value=3, max_value=10, required=False)
     token = fields.StringField(max_length=200, required=True)
     active = fields.BooleanField(required=False, default=True)
+    interests = fields.ListField(fields.IntField())
 
     meta = {"db_alias": "default"}

@@ -24,17 +24,18 @@ def login(request):
                 user = User.objects(mobile=mobile)
 
                 if len(user) == 0:
-                    # todo generate a random otp and message the user
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['new_user'] = True
+
                 elif len(user[0].name) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['new_user'] = True
+
                 else:
                     resp = create_resp_dict(True, USER_EXISTS)
                     resp['user_details'] = {"name": user[0].name}
                     resp['new_user'] = False
-
+                resp['otp'] = generate_otp(mobile)
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
@@ -56,7 +57,7 @@ def update_profile(request):
                 user_id = body_data['user_id']
                 user_data = body_data['user']
 
-                user = User.objects.get(id=user_id)
+                user = User.objects.get(_id=user_id)
                 user_type = user.user_type
 
                 resp = create_resp_dict(True, USER_UPDATED)
@@ -102,7 +103,7 @@ def profile(request):
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
 
-                user = User.objects.get(id=user_id)
+                user = User.objects.get(_id=user_id)
 
                 user_details = create_user_dict(user)
                 resp = create_resp_dict(True, USER_FETCHED)
@@ -130,29 +131,28 @@ def auth(request):
                 user_language = body_data['user_language']
                 token = body_data['token']
 
-                if user_otp == otp:
+                user = User.objects(mobile=mobile)
 
-                    user = User.objects(mobile=mobile)
+                if user_otp == otp:
 
                     if len(user) == 0:
                         user_type = body_data['user_type']
                         new_user = User(mobile=mobile, name=name, user_type=user_type,
-                                        user_language=user_language, token=token)
+                                        user_language=user_language, token=token, _id=User.objects.count()+1)
                         new_user.save()
 
                         auth_token = generate_auth_token(new_user)
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
-                        resp_data['user_id'] = str(new_user.id)
+                        resp_data['user_id'] = new_user._id
 
                     else:
-
                         auth_token = generate_auth_token(user[0])
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
-                        resp_data['user_id'] = str(user[0].id)
+                        resp_data['user_id'] = user[0]._id
                         resp_data['user_details'] = create_user_dict(user[0])
                         resp_data['error_msg'] = "User's user_type can't be changed"
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
@@ -164,3 +164,4 @@ def auth(request):
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,
                                     status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
