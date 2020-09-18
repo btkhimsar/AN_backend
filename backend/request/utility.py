@@ -113,15 +113,15 @@ def work_requests_list(fetched_requests, user_language):
 def get_questions_dict(questions):
     questions_dict = {}
     for question in questions:
-        questions_dict[question.id] = question
+        questions_dict[str(question.id)] = question
     return questions_dict
 
 
 def request_json_for_question(ques_obj, question, user_language):
     request_data = {'title': ques_obj.text[user_language], 'subtitle': ''}
-    for ans_id in question.aId:
+    for ans_id in question['aId']:
         ans_obj = ques_obj.answers.filter(answer_id=ans_id)
-        request_data['subtitle'] += ans_obj.text[user_language] + " . "
+        request_data['subtitle'] += ans_obj[0].text[user_language] + " . "
     return request_data
 
 
