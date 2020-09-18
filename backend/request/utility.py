@@ -12,6 +12,7 @@ def create_point_dict(latitude, longitude):
 def request_json_for_myrequest(my_request, category, user_language):
     request_data = {'type': 'request', 'title': category.name[user_language], 'isCompleted': my_request.isCompleted,
                     'request_id': my_request._id, 'expiry_text': 'Expires in 7 days'}
+
     return request_data
 
 
@@ -80,10 +81,11 @@ def my_requests_list_func(fetched_requests, categories, user_language):
     ongoing_requests = []
     other_requests = []
 
-    if len(ongoing_requests):
+    if len(ongoing_requests) == 0:
         header_for_ongoing_requests(ongoing_requests, user_language)
 
         for request in fetched_requests:
+
             get_date = convert_timestamps(request.created_at)
             diff = get_date - today_date()
 

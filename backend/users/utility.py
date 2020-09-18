@@ -1,12 +1,9 @@
 import datetime
 import jwt
-from util.response import create_resp_dict
 from django.conf import settings
 from category.models import Category
 import pyotp
-from http import HTTPStatus
 from twilio.rest import Client
-from django.http.response import JsonResponse
 
 
 def create_user_dict(user):
@@ -56,9 +53,7 @@ def send_sms(mobile, generated_otp):
 
         message = client.messages.create(
             body='Your OTP is' + str(generated_otp), from_='+12095632935',
-            to='+91'+str(mobile))
-        # print(message.sid)
+            to='+91' + str(mobile))
+
     except Exception as e:
         return "Unverified Number"
-
-
