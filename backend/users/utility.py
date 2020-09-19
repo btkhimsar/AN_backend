@@ -24,9 +24,9 @@ def create_user_dict(user):
 
 
 def generate_auth_token(user):
-    request_auth_token = jwt.encode(payload={'id': str(user.id), 'num': str(user.mobile),
+    request_auth_token = jwt.encode(payload={'id': str(user.id),
                                              'exp': datetime.datetime.utcnow() + datetime.timedelta(
-                                                 hours=6)}, key=settings.SECRET_KEY, algorithm='HS256')
+                                            hours=6)}, key=settings.SECRET_KEY, algorithm='HS256')
     return request_auth_token
 
 
