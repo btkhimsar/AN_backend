@@ -32,7 +32,7 @@ def login(request):
 
                 else:
                     resp = create_resp_dict(True, USER_EXISTS)
-                    resp['name'] = {"name": user[0].name}
+                    resp['name'] = user[0].name
                     resp['newuser'] = False
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
@@ -89,7 +89,7 @@ def profile(request):
                 user = User.objects.get(_id=user_id)
 
                 resp = create_resp_dict(True, USER_FETCHED)
-                resp['user'] = create_user_dict(user)
+                create_user_dict(user, resp)
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
@@ -135,7 +135,7 @@ def auth(request):
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = user[0]._id
-                        resp_data['user'] = create_user_dict(user[0])
+                        create_user_dict(user[0], resp_data)
 
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
 

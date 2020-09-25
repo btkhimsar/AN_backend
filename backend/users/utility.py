@@ -7,32 +7,27 @@ from .models import ProviderInfo
 from category.models import Category
 
 
-def request_json_for_provider(provider_info, language):
-    request_data = {}
-    if provider_info.is_active:
-        request_data['is_active'] = provider_info.is_active
+def request_json_for_provider(provider_info, language, resp):
     if provider_info.loc_name:
-        request_data['loc_name'] = provider_info.loc_name
+        resp['user']['loc_name'] = provider_info.loc_name
     if provider_info.category:
         category_name = Category.objects.get(_id=provider_info.category).name[language]
-        request_data['category'] = category_name
+        resp['user']['category'] = category_name
     if provider_info.radius:
-        request_data['radius'] = provider_info.radius
-    return request_data
+        resp['user']['radius'] = provider_info.radius
 
 
-def create_user_dict(user):
-    user_details = {'_id': user._id, 'mobile': user.mobile, 'name': user.name, 'language': user.language,
+def create_user_dict(user, resp):
+    resp['user'] = {'_id': user._id, 'mobile': user.mobile, 'name': user.name, 'language': user.language,
                     'user_type': user.user_type}
     if user.email:
-        user_details['email'] = user.email
+        resp['user']['email'] = user.email
     if user.pic_url:
-        user_details['pic_url'] = user.pic_url
+        resp['user']['pic_url'] = user.pic_url
     if user.user_type == 'provider' and user.provider_info:
         if user.rating:
-            user_details['rating'] = user.rating
-        user_details['provider_info'] = request_json_for_provider(user.provider_info, user.language)
-    return user_details
+            resp['user']['rating'] = user.rating
+        request_json_for_provider(user.provider_info, user.language, resp)
 
 
 def generate_auth_token(user):
