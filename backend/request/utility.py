@@ -9,19 +9,26 @@ def create_point_dict(latitude, longitude):
     return point
 
 
-def request_json_for_myrequest(my_request, category, user_language):
-    request_data = {'type': 'request', 'title': category.name[user_language], 'isCompleted': my_request.isCompleted,
+def request_json_for_myrequest(my_request, category, language):
+    request_data = {'type': 'request', 'title': category.name[language], 'is_completed': my_request.is_completed,
                     'request_id': my_request._id, 'expiry_text': 'Expires in 7 days'}
 
     return request_data
 
 
-def request_json_for_workrequest(work_request, user_language):
+def request_json_for_workrequest(work_request, language):
     user = User.objects.get(_id=work_request.user_id)
-    request_data = {'title': work_request.location_name, 'image_url': user.profile_image, 'mobile': work_request.mobile,
-                    'type': 'request', 'name': user.name, 'request_id': work_request._id}
+    request_data = {'req_id': work_request._id, 'reqby_name': user.name, 'reqby_rating': user.rating,
+                    'loc_name': work_request.location, "mobile": user.mobile}
+    # add req_summary
+    # add work
+    if user.pic_url:
+        request_data['reqby_img'] = user.pic_url
+    elif user.aud_url:
+        request_data['aud_url'] = user.aud_url
+    # add time if it is created today otherwise send date
     get_date = convert_timestamps(work_request.created_at)
-    request_data['created_date'] = str(get_date.day) + ' ' + str(get_month[get_date.month][user_language])
+    request_data['created_at'] = str(get_date.day) + ' ' + str(get_month[get_date.month][language])
     return request_data
 
 
@@ -48,7 +55,7 @@ def location_text(language, isCompleted_requests, category):
 
 def notification(users_list, location_name):
     for user in users_list:
-        body['to'] = user.token
+        body['to'] = user.fcm_token
         body['data']['title'] = '{} from {} requested for your service'.format(user.name, location_name)
         requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, json=body)
 
@@ -56,14 +63,7 @@ def notification(users_list, location_name):
 def categories_dict(categories_list):
     request_dict = {}
     for category in categories_list:
-        request_dict[str(category.id)] = category
-    return request_dict
-
-
-def super_categories_dict(super_categories_list):
-    request_dict = {}
-    for super_category in super_categories_list:
-        request_dict[str(super_category.id)] = super_category
+        request_dict[category.id] = category
     return request_dict
 
 
@@ -77,35 +77,35 @@ def convert_timestamps(timestmp):
     return date.fromtimestamp(timestmp)
 
 
-def my_requests_list_func(fetched_requests, categories, user_language):
+def my_requests_list_func(fetched_requests, categories, language):
     ongoing_requests = []
     other_requests = []
 
-    if len(ongoing_requests) == 0:
-        header_for_ongoing_requests(ongoing_requests, user_language)
+    if len(fetched_requests):
+        header_for_ongoing_requests(ongoing_requests, language)
 
         for request in fetched_requests:
 
             get_date = convert_timestamps(request.created_at)
             diff = get_date - today_date()
 
-            request_obj = request_json_for_myrequest(request, categories[request.category_id], user_language)
-            request_obj['subtitle'] = str(get_date.day) + ' ' + str(get_month[get_date.month][user_language])
+            request_obj = request_json_for_myrequest(request, categories[request.category_id], language)
+            request_obj['subtitle'] = str(get_date.day) + ' ' + str(get_month[get_date.month][language])
 
-            if diff.days <= 7 and (request.isCompleted == False):
+            if diff.days <= 7 and (request.is_completed == False):
                 ongoing_requests.append(request_obj)
             else:
                 if len(other_requests) == 0:
-                    header_for_other_requests(other_requests, user_language)
+                    header_for_other_requests(other_requests, language)
                 other_requests.append(request_obj)
 
     return ongoing_requests + other_requests
 
 
-def work_requests_list(fetched_requests, user_language):
+def work_requests_list(fetched_requests, language):
     requests_list = []
     for request in fetched_requests:
-        request_obj = request_json_for_workrequest(request, user_language)
+        request_obj = request_json_for_workrequest(request, language)
         requests_list.append(request_obj)
     return requests_list
 
@@ -135,14 +135,15 @@ def get_questions(questions, questions_dict, user_language):
 
 
 def request_json_for_user(user):
-    request_data = {'profile_image': user.profile_image, 'name': user.name,
-                    'user_id': user._id, 'mobile': user.mobile}
+    request_data = {'name': user.name, 'user_id': user._id, 'mobile': user.mobile}
+    if user.pic_url:
+        request_data['pic_url'] = user.pic_url
     return request_data
 
 
-def get_user_details(users_list):
-    users_details_list = []
+def get_provider_details(users_list):
+    providers_list = []
     for user in users_list:
         user_obj = request_json_for_user(user)
-        users_details_list.append(user_obj)
-    return users_details_list
+        providers_list.append(user_obj)
+    return providers_list

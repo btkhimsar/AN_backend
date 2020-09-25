@@ -22,9 +22,10 @@ def add_question(request):
                 text = body_data['text']
                 isMandatory = body_data['isMandatory']
 
-                question = Question(question_type=question_type, isMandatory=isMandatory)
-                for i in text:
-                    question.text[i] = text[i]
+                question = Question(question_type=question_type, isMandatory=isMandatory,
+                                    _id=Question.objects.count()+1)
+                for language in text:
+                    question.text[language] = text[language]
                 question.save()
                 return JsonResponse(data=create_resp_dict(True, QUESTION_CREATED), safe=False,
                                     status=HTTPStatus.OK)
@@ -46,7 +47,7 @@ def add_answer(request):
                 text = body_data['text']
                 qId = body_data['qId']
 
-                question = Question.objects.get(id=qId)
+                question = Question.objects.get(_id=qId)
                 answer = Answer()
 
                 for language in text:
@@ -73,18 +74,19 @@ def add_sub_question(request):
                 question_type = body_data['question_type']
                 text = body_data['text']
                 isMandatory = body_data['isMandatory']
-                answer_id = body_data['answer_id']
+                aId = body_data['aId']
                 qId = body_data['qId']
 
-                question = Question.objects.get(id=qId)
-                answer = question.answers.filter(answer_id=answer_id)[0]
-                sub_question = SubQuestion(question_type=question_type,
-                                           isMandatory=isMandatory)
+                question = Question.objects.get(_id=qId)
+                answer = question.answers.filter(ans_id=aId)[0]
+                sub_question = Question(question_type=question_type, isMandatory=isMandatory,
+                                        _id=Question.objects.count()+1)
 
                 for language in text:
                     sub_question.text[language] = text[language]
-                answer.questions.append(sub_question)
+                answer.questions.append(sub_question._id)
                 question.save()
+                sub_question.save()
                 return JsonResponse(data=create_resp_dict(True, SUBQUESTION_ADDED), safe=False,
                                     status=HTTPStatus.OK)
 
@@ -103,18 +105,14 @@ def add_sub_answer(request):
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
                 text = body_data['text']
-                question_id = body_data['question_id']
-                answer_id = body_data['answer_id']
                 qId = body_data['qId']
 
-                question = Question.objects.get(id=qId)
-                answer = question.answers.filter(answer_id=answer_id)[0]
-                sub_question = answer.questions.filter(question_id=question_id)[0]
-                sub_answer = SubAnswer()
+                question = Question.objects.get(_id=qId)
+                sub_answer = Answer()
 
                 for language in text:
                     sub_answer.text[language] = text[language]
-                sub_question.answers.append(sub_answer)
+                question.answers.append(sub_answer)
                 question.save()
                 return JsonResponse(data=create_resp_dict(True, SUBANSWER_ADDED), safe=False,
                                     status=HTTPStatus.OK)
@@ -134,15 +132,15 @@ def questions(request):
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
                 category_id = body_data['category_id']
-                user_language = body_data['user_language']
+                language = body_data['language']
 
-                category = Category.objects.get(id=category_id)
+                category = Category.objects.get(_id=category_id)
                 questions_list = Question.objects
 
                 questions_dict = questions_dict_func(questions_list)
 
                 resp_data = create_resp_dict(True, QUESTION_FETCHED)
-                resp_data['questions_list'] = questions_list_func(questions_dict, category, user_language)
+                questions_list_func(questions_dict, category, language, resp_data)
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:

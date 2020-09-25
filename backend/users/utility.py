@@ -1,32 +1,44 @@
 import datetime
 import jwt
 from django.conf import settings
-from category.models import Category
 import pyotp
 from twilio.rest import Client
+from .models import ProviderInfo
+from category.models import Category
+
+
+def request_json_for_provider(provider_info, language):
+    request_data = {}
+    if provider_info.is_active:
+        request_data['is_active'] = provider_info.is_active
+    if provider_info.loc_name:
+        request_data['loc_name'] = provider_info.loc_name
+    if provider_info.category:
+        category_name = Category.objects.get(_id=provider_info.category).name[language]
+        request_data['category'] = category_name
+    if provider_info.radius:
+        request_data['radius'] = provider_info.radius
+    return request_data
 
 
 def create_user_dict(user):
-    user_details = {'mobile': user.mobile, 'name': user.name, 'user_language': user.user_language,
-                    'user_type': user.user_type, 'token': user.token, 'active': user.active}
-    if user.work_category:
-        category = Category.objects.get(id=user.work_category)
-        user_details['work_category'] = category.name[user.user_language]
-    if user.base_location:
-        user_details['base_location'] = user.base_location
-    if user.work_radius:
-        user_details['work_radius'] = user.work_radius
+    user_details = {'_id': user._id, 'mobile': user.mobile, 'name': user.name, 'language': user.language,
+                    'user_type': user.user_type}
     if user.email:
         user_details['email'] = user.email
-    if user.address:
-        user_details['address'] = user.address
+    if user.pic_url:
+        user_details['pic_url'] = user.pic_url
+    if user.user_type == 'provider' and user.provider_info:
+        if user.rating:
+            user_details['rating'] = user.rating
+        user_details['provider_info'] = request_json_for_provider(user.provider_info, user.language)
     return user_details
 
 
 def generate_auth_token(user):
     request_auth_token = jwt.encode(payload={'id': str(user.id),
                                              'exp': datetime.datetime.utcnow() + datetime.timedelta(
-                                            hours=6)}, key=settings.SECRET_KEY, algorithm='HS256')
+                                            days=1)}, key=settings.SECRET_KEY, algorithm='HS256')
     return request_auth_token
 
 
@@ -57,3 +69,27 @@ def send_sms(mobile, generated_otp):
 
     except Exception as e:
         return "Unverified Number"
+
+
+def update_provider_info(user, user_data, resp):
+    info = ProviderInfo()
+    for key in user_data:
+        if key == 'is_active':
+            info.is_active = user_data[key]
+        elif key == 'loc_name':
+            info.loc_name = user_data[key]
+        elif key == 'loc':
+            point = create_point_dict(user_data[key]['latitude'], user_data[key]['longitude'])
+            info.loc = point
+        elif key == 'category':
+            if info.category is None:
+                category = Category.objects.get(_id=user_data[key])
+                info.category = user_data[key]
+            else:
+                resp['error_code'] = 101
+        elif key == 'radius':
+            info.radius = user_data[key]
+        elif key == 'rating':
+            user.rating = user_data[key]
+    user.provider_info = info
+    user.save()

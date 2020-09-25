@@ -3,11 +3,10 @@ from http import HTTPStatus
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 from Constants.response_strings import *
-from Constants.otp import *
+from Constants.otp import user_otp
 from util.response import create_resp_dict, token_required
 from .models import User
 from .utility import *
-from category.models import Category
 
 
 @api_view(['POST'])
@@ -25,17 +24,16 @@ def login(request):
 
                 if len(user) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
-                    resp['new_user'] = True
+                    resp['newuser'] = True
 
                 elif len(user[0].name) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
-                    resp['new_user'] = True
+                    resp['newuser'] = True
 
                 else:
                     resp = create_resp_dict(True, USER_EXISTS)
-                    resp['user_details'] = {"name": user[0].name}
-                    resp['new_user'] = False
-                resp['otp'] = generate_otp(mobile)
+                    resp['name'] = {"name": user[0].name}
+                    resp['newuser'] = False
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
@@ -58,31 +56,16 @@ def update_profile(request):
                 user_data = body_data['user']
 
                 user = User.objects.get(_id=user_id)
-                user_type = user.user_type
 
                 resp = create_resp_dict(True, USER_UPDATED)
 
                 for key in user_data:
-                    if user_type == 'provider':
-                        if key != 'mobile' and key != 'user_type':
-                            if key == 'base_location':
-                                location = create_point_dict(user_data[key]['latitude'],
-                                                             user_data[key]['longitude'])
-                                user[key] = location
-                            elif key == 'work_category' and user[key]:
-                                resp['user_details'] = "User's work_category can't be changed."
-                            else:
-                                if key == 'work_category':
-                                    category = Category.objects.get(id=user_data[key])
-                                user[key] = user_data[key]
-                        else:
-                            resp['user_details'] = "User's user_type can't be changed."
-                    else:
-                        if key != 'mobile' and key != 'user_type':
-                            user[key] = user_data[key]
-                        else:
-                            resp['user_details'] = "User's user_type can't be changed."
-                user.save()
+                    if key == 'email':
+                        user[key] = user_data[key]
+                    elif key == 'pic_url':
+                        user[key] = user_data[key]
+                if user.user_type == 'provider':
+                    update_provider_info(user, user_data, resp)
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
@@ -105,9 +88,8 @@ def profile(request):
 
                 user = User.objects.get(_id=user_id)
 
-                user_details = create_user_dict(user)
                 resp = create_resp_dict(True, USER_FETCHED)
-                resp['user_details'] = user_details
+                resp['user'] = create_user_dict(user)
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
@@ -126,19 +108,19 @@ def auth(request):
             try:
                 body_data = json.loads(request.body.decode('utf-8'))
                 mobile = body_data['mobile']
-                user_otp = body_data['user_otp']
+                otp = body_data['otp']
                 name = body_data['name']
-                user_language = body_data['user_language']
-                token = body_data['token']
+                language = body_data['language']
+                fcm_token = body_data['fcm_token']
 
                 user = User.objects(mobile=mobile)
 
-                if user_otp == otp:
+                if otp == user_otp:
 
                     if len(user) == 0:
                         user_type = body_data['user_type']
                         new_user = User(mobile=mobile, name=name, user_type=user_type,
-                                        user_language=user_language, token=token, _id=User.objects.count()+1)
+                                        language=language, fcm_token=fcm_token, _id=User.objects.count()+1)
                         new_user.save()
 
                         auth_token = generate_auth_token(new_user)
@@ -153,8 +135,8 @@ def auth(request):
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
                         resp_data['user_id'] = user[0]._id
-                        resp_data['user_details'] = create_user_dict(user[0])
-                        resp_data['error_msg'] = "User's user_type can't be changed"
+                        resp_data['user'] = create_user_dict(user[0])
+
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
 
                 else:
