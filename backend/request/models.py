@@ -10,7 +10,7 @@ class Request(Document):
     created_at = fields.LongField(timestamps=True)
     user_id = fields.LongField(required=True)
     is_completed = fields.BooleanField(default=False, required=False)
-    questions = fields.ListField(fields.DictField(), required=False)
+    questions = fields.DictField(required=False)
     new_interest_count = fields.IntField(required=False, default=0)
     interested_users = fields.ListField(fields.LongField(), required=False)
     aud_url = fields.StringField(required=False, max_length=100)

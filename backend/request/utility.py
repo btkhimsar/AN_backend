@@ -16,12 +16,12 @@ def request_json_for_myrequest(my_request, category, language):
     return request_data
 
 
-def request_json_for_workrequest(work_request, language):
+def request_json_for_workrequest(work_request, language, questions_dict):
     user = User.objects.get(_id=work_request.user_id)
     request_data = {'req_id': work_request._id, 'reqby_name': user.name, 'reqby_rating': user.rating,
                     'loc_name': work_request.location, "mobile": user.mobile}
     # add req_summary
-    # add work
+    request_data['work'] = get_questions(work_request.questions, questions_dict, language)
     if user.pic_url:
         request_data['reqby_img'] = user.pic_url
     elif user.aud_url:
@@ -102,10 +102,10 @@ def my_requests_list_func(fetched_requests, categories, language):
     return ongoing_requests + other_requests
 
 
-def work_requests_list(fetched_requests, language):
+def work_requests_list(fetched_requests, language, questions_dict):
     requests_list = []
     for request in fetched_requests:
-        request_obj = request_json_for_workrequest(request, language)
+        request_obj = request_json_for_workrequest(request, language, questions_dict)
         requests_list.append(request_obj)
     return requests_list
 
@@ -117,19 +117,31 @@ def get_questions_dict(questions):
     return questions_dict
 
 
-def request_json_for_question(ques_obj, question, user_language):
-    request_data = {'title': ques_obj.text[user_language], 'subtitle': ''}
-    for ans_id in question['aId']:
-        ans_obj = ques_obj.answers.filter(answer_id=ans_id)
-        request_data['subtitle'] += ans_obj[0].text[user_language] + " . "
+def request_json_for_question(ques_obj, language, answer):
+    request_data = {'title': ques_obj.text[language]}
+
+    if ques_obj.question_type == 'text':
+        request_data['subtitle'] = answer
+
+    elif ques_obj.question_type == 'select-one':
+        ans_obj = ques_obj.answers.filter(ans_id=answer)[0]
+        request_data['subtitle'] = ans_obj.text[language]
+
+    elif ques_obj.question_type == 'select-many':
+        ans_string = ""
+        for ans_id in answer:
+            ans_obj = ques_obj.answers.filter(ans_id=ans_id)[0]
+            ans_string += ans_obj.text[language] + " . "
+        request_data['subtitle'] = ans_string[:-3]
+
     return request_data
 
 
-def get_questions(questions, questions_dict, user_language):
+def get_questions(questions, questions_dict, language):
     questions_list = []
-    for question in questions:
-        ques_obj = questions_dict[question['qId']]
-        questions_list.append(request_json_for_question(ques_obj, question, user_language))
+    for qId in questions:
+        ques_obj = questions_dict[qId]
+        questions_list.append(request_json_for_question(ques_obj, language, questions[qId]))
 
     return questions_list
 

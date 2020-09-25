@@ -33,12 +33,14 @@ def work_requests(request):
                 workrequests = Request.objects(location__geo_within_center=[(location['latitude'],
                                             location['longitude']), radius], category_id=user.provider_info.category,
                                                is_completed=False).order_by('-created_at')
+                questions_list = Question.objects
+                questions_dict = get_questions_dict(questions_list)
 
                 resp_data = create_resp_dict(True, WORK_REQUEST_FETCHED)
                 resp_data['location_text'] = location_text(language, len(workrequests), category)
                 resp_data['loc_img'] = ""
                 resp_data['work_img'] = ""
-                resp_data['workrequests'] = work_requests_list(workrequests, language)
+                resp_data['workrequests'] = work_requests_list(workrequests, language, questions_dict)
 
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
 
@@ -119,8 +121,8 @@ def create_request(request):
                 if comment:
                     request['comment'] = comment
                 if questions:
-                    for question in questions:
-                        request['questions'].append(question)
+                    for ques_id in questions:
+                        request['questions'][ques_id] = questions[ques_id]
                 if aud_url:
                     request['aud_url'] = aud_url
                 request.save()

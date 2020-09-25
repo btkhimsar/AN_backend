@@ -11,7 +11,7 @@ def answer_json(ans_obj, language, resp_data, questions_dict):
     request_data = {'answer_id': ans_obj.ans_id, 'text': ans_obj.text[language],
                     'questions': ans_obj.questions}
     for ques_id in ans_obj.questions:
-        resp_data['secondary_questions'].append({ques_id: sub_question_json(questions_dict[ques_id], language)})
+        resp_data['secondary_questions'][ques_id] = sub_question_json(questions_dict[ques_id], language)
     return request_data
 
 
@@ -38,7 +38,7 @@ def questions_dict_func(questions_list):
 
 def questions_list_func(questions_dict, category, language, resp_data):
     resp_data['primary_questions'] = []
-    resp_data['secondary_questions'] = []
+    resp_data['secondary_questions'] = {}
     for ques_id in category.questions:
         resp_data['primary_questions'].append(
             question_json(questions_dict[ques_id], language, resp_data, questions_dict))
