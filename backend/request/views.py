@@ -214,15 +214,16 @@ def my_request_details(request):
                 request = Request.objects.get(_id=request_id)
                 users_list = User.objects(_id__in=request.interested_users)
                 category = Category.objects.get(_id=request.category_id)
-                fetched_questions = Question.objects
+                # fetched_questions = Question.objects
                 get_date = today_date()
 
-                questions_dict = get_questions_dict(fetched_questions)
+                # questions_dict = get_questions_dict(fetched_questions)
 
                 resp = create_resp_dict(True, "Details Fetched")
                 resp['title'] = "For {}".format(category.name[language])
                 resp['subtitle'] = str(get_date.day) + ' ' + str(get_month[get_date.month][language])
-                resp['work'] = get_questions(request.questions, questions_dict, language)
+                # resp['work'] = get_questions(request.questions, questions_dict, language)
+                resp['work'] = ""
                 resp['aud_url'] = request.aud_url
                 resp['interested_users_text'] = "Interested {} ({})".format(category.name[language],
                                                                             len(request.interested_users))
