@@ -12,20 +12,23 @@ def create_point_dict(latitude, longitude):
 def request_json_for_myrequest(my_request, category, language):
     request_data = {'type': 'request', 'title': category.name[language], 'is_completed': my_request.is_completed,
                     'request_id': my_request._id, 'expiry_text': 'Expires in 7 days'}
-
+    if my_request.new_interest_count:
+        request_data['new_interest_count'] = my_request.new_interest_count
     return request_data
 
 
 def request_json_for_workrequest(work_request, language, questions_dict):
     user = User.objects.get(_id=work_request.user_id)
     request_data = {'req_id': work_request._id, 'reqby_name': user.name, 'reqby_rating': user.rating,
-                    'loc_name': work_request.location, "mobile": user.mobile}
+                    'loc_name': work_request.location,
+                    'work': get_questions(work_request.questions, questions_dict, language)}
     # add req_summary
-    request_data['work'] = get_questions(work_request.questions, questions_dict, language)
     if user.pic_url:
         request_data['reqby_img'] = user.pic_url
-    elif user.aud_url:
-        request_data['aud_url'] = user.aud_url
+    if work_request.aud_url:
+        request_data['aud_url'] = work_request.aud_url
+    if work_request.share_mobile == True:
+        request_data['mobile'] = user.mobile
     # add time if it is created today otherwise send date
     get_date = convert_timestamps(work_request.created_at)
     request_data['created_at'] = str(get_date.day) + ' ' + str(get_month[get_date.month][language])
@@ -159,3 +162,9 @@ def get_provider_details(users_list):
         user_obj = request_json_for_user(user)
         providers_list.append(user_obj)
     return providers_list
+
+
+def notification_to_consumer(consumer, provider):
+    body['to'] = consumer.fcm_token
+    body['data']['title'] = '{} has requested for your service.'.format(provider.name)
+    requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, json=body)

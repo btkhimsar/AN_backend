@@ -11,6 +11,7 @@ class ProviderInfo(EmbeddedDocument):
     loc = fields.PointField(required=False)
     category = fields.IntField(required=False)
     radius = fields.IntField(default=5, required=False)
+    complaints_count = fields.IntField(required=False, default=0)
 
 
 class User(Document):

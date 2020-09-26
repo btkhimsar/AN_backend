@@ -147,3 +147,29 @@ def auth(request):
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,
                                     status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
+
+@api_view(['POST'])
+@token_required
+def is_active(request):
+    if request.method == 'POST':
+        if request.body is None or len(request.body.decode('utf-8')) == 0:
+            return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
+                                status=HTTPStatus.BAD_REQUEST)
+        else:
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+                auth_token = body_data['auth_token']
+                user_id = body_data['user_id']
+                is_active = body_data['is_active']
+
+                user = User.objects.get(_id=user_id)
+                user.is_active = is_active
+                user.save()
+
+                return JsonResponse(data=create_resp_dict(True, USER_UPDATED), safe=False,
+                                    status=HTTPStatus.OK)
+
+            except Exception as e:
+                return JsonResponse(data=create_resp_dict(False, e), safe=False,
+                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+

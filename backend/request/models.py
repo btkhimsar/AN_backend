@@ -15,7 +15,7 @@ class Request(Document):
     interested_users = fields.ListField(fields.LongField(), required=False)
     aud_url = fields.StringField(required=False, max_length=100)
     completed_by = fields.LongField(required=False)
-    share_mobile = fields.BooleanField(required=False, default=False)
+    share_mobile = fields.BooleanField(required=True, default=False)
     complaints_count = fields.IntField(required=False, default=0)
 
     meta = {"db_alias": "default"}

@@ -100,6 +100,7 @@ def create_request(request):
                 location_name = body_data['location_name']
                 questions = body_data['questions']
                 aud_url = body_data['aud_url']
+                share_mobile = body_data['share_mobile']
 
                 customer = User.objects.get(_id=user_id)
 
@@ -112,7 +113,7 @@ def create_request(request):
 
                 point = create_point_dict(location['latitude'], location['longitude'])
                 request = Request(category_id=category_id, location=point, user_id=user_id, location_name=location_name,
-                                  _id=Request.objects.count()+1)
+                                  _id=Request.objects.count()+1, share_mobile=share_mobile)
 
                 now = datetime.now()
                 request['created_at'] = datetime.timestamp(now)
@@ -182,12 +183,18 @@ def send_interest(request):
                 request_id = body_data['request_id']
 
                 request = Request.objects.get(_id=request_id)
-                user = User.objects.get(_id=user_id)
+                provider = User.objects.get(_id=user_id)
+                consumer = User.objects.get(_id=request.user_id)
 
                 request.interested_users.append(user_id)
-                user.provider_info.sent_interests.append(request_id)
-                user.save()
+                request.new_interest_count += 1
                 request.save()
+
+                provider.provider_info.sent_interests.append(request_id)
+                provider.save()
+
+                notification_to_consumer(consumer, provider)
+
                 return JsonResponse(data=create_resp_dict(True, "Interest Sent"), safe=False,
                                     status=HTTPStatus.OK)
 
@@ -214,21 +221,84 @@ def my_request_details(request):
                 request = Request.objects.get(_id=request_id)
                 users_list = User.objects(_id__in=request.interested_users)
                 category = Category.objects.get(_id=request.category_id)
-                # fetched_questions = Question.objects
+                fetched_questions = Question.objects
                 get_date = today_date()
 
-                # questions_dict = get_questions_dict(fetched_questions)
+                questions_dict = get_questions_dict(fetched_questions)
+
+                request.new_interest_count = 0
+                request.save()
 
                 resp = create_resp_dict(True, "Details Fetched")
                 resp['title'] = "For {}".format(category.name[language])
                 resp['subtitle'] = str(get_date.day) + ' ' + str(get_month[get_date.month][language])
-                # resp['work'] = get_questions(request.questions, questions_dict, language)
-                resp['work'] = ""
+                resp['work'] = get_questions(request.questions, questions_dict, language)
                 resp['aud_url'] = request.aud_url
                 resp['interested_users_text'] = "Interested {} ({})".format(category.name[language],
                                                                             len(request.interested_users))
                 resp['interested_users'] = get_provider_details(users_list)
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
+
+            except Exception as e:
+                return JsonResponse(data=create_resp_dict(False, e), safe=False,
+                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@token_required
+def interests_sent(request):
+    if request.method == 'POST':
+        if request.body is None or len(request.body.decode('utf-8')) == 0:
+            return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
+                                status=HTTPStatus.BAD_REQUEST)
+        else:
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+                auth_token = body_data['auth_token']
+                user_id = body_data['user_id']
+                language = body_data['language'].lower()
+
+                user = User.objects.get(_id=user_id)
+                requests_list = Request.objects(_id__in=user.provider_info.sent_interests)
+                questions_list = Question.objects
+
+                questions_dict = get_questions_dict(questions_list)
+
+                resp = create_resp_dict(True, WORK_REQUEST_FETCHED)
+                resp['interests_sent'] = work_requests_list(requests_list, language, questions_dict)
+
+                return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
+
+            except Exception as e:
+                return JsonResponse(data=create_resp_dict(False, e), safe=False,
+                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@token_required
+def mark_as_spam(request):
+    if request.method == 'POST':
+        if request.body is None or len(request.body.decode('utf-8')) == 0:
+            return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
+                                status=HTTPStatus.BAD_REQUEST)
+        else:
+            try:
+                body_data = json.loads(request.body.decode('utf-8'))
+                auth_token = body_data['auth_token']
+                user_id = body_data['user_id']
+                provider_id = body_data['provider_id']
+                request_id = body_data['request_id']
+
+                provider = User.objects.get(_id=provider_id)
+                request = Request.objects.get(_id=request_id)
+
+                provider.provider_info.complaints_count += 1
+                provider.save()
+
+                request.complaints_count += 1
+                request.save()
+
+                return JsonResponse(data=create_resp_dict(True, "Marked As Spam"), safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,
