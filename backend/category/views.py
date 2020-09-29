@@ -48,12 +48,12 @@ def create_category(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 name = body_data['name']
                 icon_url = body_data['icon_url']
-                new_category = Category(icon_url=icon_url, _id=Category.objects.count()+1)
+                new_category = Category(icon_url=icon_url)
                 for language in name:
                     new_category.name[language] = name[language]
                 new_category.save()
                 resp = create_resp_dict(True, SUBCATEGORY_ADDED)
-                resp['category_id'] = new_category._id
+                resp['category_id'] = str(new_category.id)
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
@@ -70,8 +70,7 @@ def create_super_category(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 name = body_data['name']
                 default_view_count = body_data['default_view_count']
-                new_super_category = SuperCategory(default_view_count=default_view_count,
-                                                   _id=SuperCategory.objects.count()+1)
+                new_super_category = SuperCategory(default_view_count=default_view_count)
                 for language in name:
                     new_super_category.name[language] = name[language]
                 new_super_category.save()

@@ -134,7 +134,7 @@ def questions(request):
                 category_id = body_data['category_id']
                 language = body_data['language']
 
-                category = Category.objects.get(_id=category_id)
+                category = Category.objects.get(id=category_id)
                 questions_list = Question.objects
 
                 questions_dict = questions_dict_func(questions_list)

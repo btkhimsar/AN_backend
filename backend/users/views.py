@@ -55,7 +55,7 @@ def update_profile(request):
                 user_id = body_data['user_id']
                 user_data = body_data['user']
 
-                user = User.objects.get(_id=user_id)
+                user = User.objects.get(id=user_id)
 
                 resp = create_resp_dict(True, USER_UPDATED)
 
@@ -86,7 +86,7 @@ def profile(request):
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
 
-                user = User.objects.get(_id=user_id)
+                user = User.objects.get(id=user_id)
 
                 resp = create_resp_dict(True, USER_FETCHED)
                 create_user_dict(user, resp)
@@ -120,21 +120,21 @@ def auth(request):
                     if len(user) == 0:
                         user_type = body_data['user_type']
                         new_user = User(mobile=mobile, name=name, user_type=user_type,
-                                        language=language, fcm_token=fcm_token, _id=User.objects.count()+1)
+                                        language=language, fcm_token=fcm_token)
                         new_user.save()
 
                         auth_token = generate_auth_token(new_user)
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
-                        resp_data['user_id'] = new_user._id
+                        resp_data['user_id'] = str(new_user.id)
 
                     else:
                         auth_token = generate_auth_token(user[0])
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
-                        resp_data['user_id'] = user[0]._id
+                        resp_data['user_id'] = str(user[0].id)
                         create_user_dict(user[0], resp_data)
 
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
@@ -162,7 +162,7 @@ def is_active(request):
                 user_id = body_data['user_id']
                 is_active = body_data['is_active']
 
-                user = User.objects.get(_id=user_id)
+                user = User.objects.get(id=user_id)
                 user.is_active = is_active
                 user.save()
 

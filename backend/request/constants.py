@@ -61,3 +61,8 @@ get_month = {
     },
 
 }
+
+get_hour_string = {
+    'english': 'hours',
+    'hindi': 'घंटे'
+}

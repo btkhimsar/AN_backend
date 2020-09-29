@@ -11,14 +11,16 @@ def request_json_for_provider(provider_info, language, resp):
     if provider_info.loc_name:
         resp['user']['loc_name'] = provider_info.loc_name
     if provider_info.category:
-        category_name = Category.objects.get(_id=provider_info.category).name[language]
-        resp['user']['category'] = category_name
+        category_list = Category.objects(id__in=provider_info.category)
+        resp['user']['category'] = []
+        for each_category in category_list:
+            resp['user']['category'].append(each_category.name[language])
     if provider_info.radius:
         resp['user']['radius'] = provider_info.radius
 
 
 def create_user_dict(user, resp):
-    resp['user'] = {'_id': user._id, 'mobile': user.mobile, 'name': user.name, 'language': user.language,
+    resp['user'] = {'user_id': str(user.id), 'mobile': user.mobile, 'name': user.name, 'language': user.language,
                     'user_type': user.user_type}
     if user.email:
         resp['user']['email'] = user.email
@@ -77,11 +79,10 @@ def update_provider_info(user, user_data, resp):
             point = create_point_dict(user_data[key]['latitude'], user_data[key]['longitude'])
             info.loc = point
         elif key == 'category':
-            if info.category is None:
-                category = Category.objects.get(_id=user_data[key])
-                info.category = user_data[key]
-            else:
-                resp['error_code'] = 101
+            category_list = Category.objects(id__in=user_data[key])
+            for category in user_data[key]:
+                if info.category.count(category) == 0:
+                    info.category.append(category)
         elif key == 'radius':
             info.radius = user_data[key]
         elif key == 'rating':

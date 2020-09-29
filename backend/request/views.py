@@ -28,16 +28,15 @@ def work_requests(request):
                 radius = body_data['radius']/105
                 language = body_data['language']
 
-                user = User.objects.get(_id=user_id)
-                category = Category.objects.get(_id=user.provider_info.category)
+                user = User.objects.get(id=user_id)
                 workrequests = Request.objects(location__geo_within_center=[(location['latitude'],
-                                            location['longitude']), radius], category_id=user.provider_info.category,
+                                            location['longitude']), radius], category_id__in=user.provider_info.category,
                                                is_completed=False).order_by('-created_at')
                 questions_list = Question.objects
                 questions_dict = get_questions_dict(questions_list)
 
                 resp_data = create_resp_dict(True, WORK_REQUEST_FETCHED)
-                resp_data['location_text'] = location_text(language, len(workrequests), category)
+                resp_data['location_text'] = location_text(language, len(workrequests))
                 resp_data['loc_img'] = ""
                 resp_data['work_img'] = ""
                 resp_data['workrequests'] = work_requests_list(workrequests, language, questions_dict)
@@ -102,9 +101,9 @@ def create_request(request):
                 aud_url = body_data['aud_url']
                 share_mobile = body_data['share_mobile']
 
-                customer = User.objects.get(_id=user_id)
+                customer = User.objects.get(id=user_id)
 
-                category = Category.objects.get(_id=category_id)
+                category = Category.objects.get(id=category_id)
 
                 providers_list = User.objects(user_type='provider')
                 users_list = providers_list(provider_info__loc__geo_within_center=
@@ -113,10 +112,7 @@ def create_request(request):
 
                 point = create_point_dict(location['latitude'], location['longitude'])
                 request = Request(category_id=category_id, location=point, user_id=user_id, location_name=location_name,
-                                  _id=Request.objects.count()+1, share_mobile=share_mobile)
-
-                now = datetime.now()
-                request['created_at'] = datetime.timestamp(now)
+                                 share_mobile=share_mobile)
 
                 resp_data = create_resp_dict(True, REQUEST_CREATED)
                 if comment:
@@ -127,12 +123,12 @@ def create_request(request):
                 if aud_url:
                     request['aud_url'] = aud_url
                 request.save()
-                customer.my_requests.append(request._id)
+                customer.my_requests.append(str(request.id))
                 customer.save()
 
                 notification(users_list, location_name)
 
-                resp_data['requestId'] = str(request._id)
+                resp_data['requestId'] = str(request.id)
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
             except Exception as e:
                 return JsonResponse(data=create_resp_dict(False, e), safe=False,
@@ -154,8 +150,8 @@ def request_completion(request):
                 request_id = body_data['request_id']
                 completed_by = body_data['completed_by']
 
-                request = Request.objects.get(_id=request_id)
-                user = User.objects.get(_id=completed_by)
+                request = Request.objects.get(id=request_id)
+                user = User.objects.get(id=completed_by)
 
                 request.completed_by = completed_by
                 request.is_completed = True
@@ -182,9 +178,9 @@ def send_interest(request):
                 user_id = body_data['user_id']
                 request_id = body_data['request_id']
 
-                request = Request.objects.get(_id=request_id)
-                provider = User.objects.get(_id=user_id)
-                consumer = User.objects.get(_id=request.user_id)
+                request = Request.objects.get(id=request_id)
+                provider = User.objects.get(id=user_id)
+                consumer = User.objects.get(id=request.user_id)
 
                 request.interested_users.append(user_id)
                 request.new_interest_count += 1
@@ -218,11 +214,11 @@ def my_request_details(request):
                 request_id = body_data['request_id']
                 language = body_data['language']
 
-                request = Request.objects.get(_id=request_id)
-                users_list = User.objects(_id__in=request.interested_users)
-                category = Category.objects.get(_id=request.category_id)
+                request = Request.objects.get(id=request_id)
+                users_list = User.objects(id__in=request.interested_users)
+                category = Category.objects.get(id=request.category_id)
                 fetched_questions = Question.objects
-                get_date = today_date()
+                get_date = datetime.now()
 
                 questions_dict = get_questions_dict(fetched_questions)
 
@@ -258,8 +254,8 @@ def interests_sent(request):
                 user_id = body_data['user_id']
                 language = body_data['language'].lower()
 
-                user = User.objects.get(_id=user_id)
-                requests_list = Request.objects(_id__in=user.provider_info.sent_interests)
+                user = User.objects.get(id=user_id)
+                requests_list = Request.objects(id__in=user.provider_info.sent_interests)
                 questions_list = Question.objects
 
                 questions_dict = get_questions_dict(questions_list)
@@ -289,8 +285,8 @@ def mark_as_spam(request):
                 provider_id = body_data['provider_id']
                 request_id = body_data['request_id']
 
-                provider = User.objects.get(_id=provider_id)
-                request = Request.objects.get(_id=request_id)
+                provider = User.objects.get(id=provider_id)
+                request = Request.objects.get(id=request_id)
 
                 provider.provider_info.complaints_count += 1
                 provider.save()
