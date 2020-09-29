@@ -10,6 +10,7 @@ from util.response import create_resp_dict, token_required
 from .models import Request
 from .utility import *
 from question.models import Question
+from .constants import *
 
 
 @api_view(['POST'])
@@ -27,11 +28,14 @@ def work_requests(request):
                 location = body_data['location']
                 radius = body_data['radius']/105
                 language = body_data['language']
+                page_no = body_data['page_no']
+
+                offset = (page_no-1) * requests_per_page
 
                 user = User.objects.get(id=user_id)
                 workrequests = Request.objects(location__geo_within_center=[(location['latitude'],
                                             location['longitude']), radius], category_id__in=user.provider_info.category,
-                                               is_completed=False).order_by('-created_at')
+                                               is_completed=False).order_by('-created_at').skip(offset).limit(requests_per_page)
                 questions_list = Question.objects
                 questions_dict = get_questions_dict(questions_list)
 

@@ -66,3 +66,5 @@ get_hour_string = {
     'english': 'hours',
     'hindi': 'घंटे'
 }
+
+requests_per_page = 2
