@@ -21,6 +21,10 @@ def token_required(f):
 
             if str(body_data['user_id']) == data['id']:
                 return f(request)
+            else:
+                resp = create_resp_dict(False, "Something Is Wrong With User Id")
+                resp['error_code'] = 104
+                return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
         except Exception as e:
             return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
     return decorated

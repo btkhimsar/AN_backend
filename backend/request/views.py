@@ -205,7 +205,7 @@ def send_interest(request):
 
 @api_view(['POST'])
 @token_required
-def my_request_details(request):
+def get_request_details(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
             return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
@@ -276,7 +276,7 @@ def interests_sent(request):
 
 @api_view(['POST'])
 @token_required
-def mark_as_spam(request):
+def mark_request_as_spam(request):
     if request.method == 'POST':
         if request.body is None or len(request.body.decode('utf-8')) == 0:
             return JsonResponse(data=create_resp_dict(False, INCORRECT_REQUEST), safe=False,
@@ -286,14 +286,13 @@ def mark_as_spam(request):
                 body_data = json.loads(request.body.decode('utf-8'))
                 auth_token = body_data['auth_token']
                 user_id = body_data['user_id']
-                provider_id = body_data['provider_id']
                 request_id = body_data['request_id']
 
-                provider = User.objects.get(id=provider_id)
                 request = Request.objects.get(id=request_id)
+                consumer = User.objects.get(id=request.user_id)
 
-                provider.provider_info.complaints_count += 1
-                provider.save()
+                consumer.complaints_count += 1
+                consumer.save()
 
                 request.complaints_count += 1
                 request.save()

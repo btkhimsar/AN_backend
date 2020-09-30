@@ -1,5 +1,5 @@
 def question_json(ques_obj, language, resp_data, questions_dict):
-    request_data = {'question_id': ques_obj._id, 'question_type': ques_obj.question_type,
+    request_data = {'question_id': str(ques_obj.id), 'question_type': ques_obj.question_type,
                     'text': ques_obj.text[language], 'isMandatory': ques_obj.isMandatory,
                     'answers': []}
     for answer in ques_obj.answers:
@@ -16,7 +16,7 @@ def answer_json(ans_obj, language, resp_data, questions_dict):
 
 
 def sub_question_json(sub_ques_obj, language):
-    request_data = {'question_id': sub_ques_obj._id, 'question_type': sub_ques_obj.question_type,
+    request_data = {'question_id': str(sub_ques_obj.id), 'question_type': sub_ques_obj.question_type,
                     'text': sub_ques_obj.text[language], 'isMandatory': sub_ques_obj.isMandatory,
                     'answers': []}
     for sub_answer in sub_ques_obj.answers:
@@ -32,7 +32,7 @@ def sub_answer_json(sub_ans_obj, language):
 def questions_dict_func(questions_list):
     questions_dict = {}
     for question in questions_list:
-        questions_dict[question._id] = question
+        questions_dict[str(question.id)] = question
     return questions_dict
 
 

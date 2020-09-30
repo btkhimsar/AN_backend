@@ -17,6 +17,8 @@ def request_json_for_provider(provider_info, language, resp):
             resp['user']['category'].append(each_category.name[language])
     if provider_info.radius:
         resp['user']['radius'] = provider_info.radius
+    if provider_info.is_active:
+        resp['user']['is_active'] = provider_info.is_active
 
 
 def create_user_dict(user, resp):

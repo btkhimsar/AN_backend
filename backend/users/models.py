@@ -11,7 +11,6 @@ class ProviderInfo(EmbeddedDocument):
     loc = fields.PointField(required=False)
     category = fields.ListField(fields.StringField(max_length=50), required=False)
     radius = fields.IntField(default=5, required=False)
-    complaints_count = fields.IntField(required=False, default=0)
 
 
 class User(Document):
@@ -25,5 +24,6 @@ class User(Document):
     my_requests = fields.ListField(fields.StringField(max_length=50), required=False)
     provider_info = fields.EmbeddedDocumentField(ProviderInfo)
     rating = fields.FloatField(required=False)
+    complaints_count = fields.IntField(required=False, default=0)
 
     meta = {"db_alias": "default"}

@@ -22,8 +22,8 @@ def add_question(request):
                 text = body_data['text']
                 isMandatory = body_data['isMandatory']
 
-                question = Question(question_type=question_type, isMandatory=isMandatory,
-                                    _id=Question.objects.count()+1)
+                question = Question(question_type=question_type, isMandatory=isMandatory)
+
                 for language in text:
                     question.text[language] = text[language]
                 question.save()
@@ -47,7 +47,7 @@ def add_answer(request):
                 text = body_data['text']
                 qId = body_data['qId']
 
-                question = Question.objects.get(_id=qId)
+                question = Question.objects.get(id=qId)
                 answer = Answer()
 
                 for language in text:
@@ -77,16 +77,18 @@ def add_sub_question(request):
                 aId = body_data['aId']
                 qId = body_data['qId']
 
-                question = Question.objects.get(_id=qId)
+                question = Question.objects.get(id=qId)
                 answer = question.answers.filter(ans_id=aId)[0]
-                sub_question = Question(question_type=question_type, isMandatory=isMandatory,
-                                        _id=Question.objects.count()+1)
+
+                sub_question = Question(question_type=question_type, isMandatory=isMandatory)
 
                 for language in text:
                     sub_question.text[language] = text[language]
-                answer.questions.append(sub_question._id)
-                question.save()
                 sub_question.save()
+
+                answer.questions.append(str(sub_question.id))
+                question.save()
+
                 return JsonResponse(data=create_resp_dict(True, SUBQUESTION_ADDED), safe=False,
                                     status=HTTPStatus.OK)
 
@@ -107,7 +109,7 @@ def add_sub_answer(request):
                 text = body_data['text']
                 qId = body_data['qId']
 
-                question = Question.objects.get(_id=qId)
+                question = Question.objects.get(id=qId)
                 sub_answer = Answer()
 
                 for language in text:

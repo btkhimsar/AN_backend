@@ -29,7 +29,7 @@ def request_json_for_workrequest(work_request, language, questions_dict):
     user = User.objects.get(id=work_request.user_id)
 
     request_data = {'req_id': str(work_request.id), 'reqby_name': user.name, 'reqby_rating': user.rating,
-                    'loc_name': work_request.location,
+                    'loc_name': work_request.location_name,
                     'work': get_questions(work_request.questions, questions_dict, language)}
     if user.pic_url:
         request_data['reqby_img'] = user.pic_url

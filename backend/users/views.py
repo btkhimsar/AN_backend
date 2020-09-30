@@ -134,7 +134,6 @@ def auth(request):
                         resp_data = create_resp_dict(True, AUTH_SUCCESS)
 
                         resp_data['auth_token'] = auth_token.decode('utf-8')
-                        resp_data['user_id'] = str(user[0].id)
                         create_user_dict(user[0], resp_data)
 
                     return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
@@ -163,10 +162,15 @@ def is_active(request):
                 is_active = body_data['is_active']
 
                 user = User.objects.get(id=user_id)
-                user.is_active = is_active
-                user.save()
+                if user.user_type == 'provider':
+                    user.is_active = is_active
+                    user.save()
+                    resp = create_resp_dict(True, USER_UPDATED)
+                else:
+                    resp = create_resp_dict(False, 'User Not Updated')
+                    resp['error_code'] = 103
 
-                return JsonResponse(data=create_resp_dict(True, USER_UPDATED), safe=False,
+                return JsonResponse(data=resp, safe=False,
                                     status=HTTPStatus.OK)
 
             except Exception as e:
