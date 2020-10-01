@@ -1,4 +1,4 @@
-from mongoengine import Document, fields, EmbeddedDocument
+from mongoengine import DynamicDocument, fields, EmbeddedDocument
 
 
 class Answer(EmbeddedDocument):
@@ -7,7 +7,7 @@ class Answer(EmbeddedDocument):
     questions = fields.ListField(fields.StringField())
 
 
-class Question(Document):
+class Question(DynamicDocument):
     question_type = fields.StringField(max_length=50, required=True, default="select-one")
     text = fields.MapField(fields.StringField(max_length=100), required=True)
     isMandatory = fields.BooleanField(required=False, default=True)

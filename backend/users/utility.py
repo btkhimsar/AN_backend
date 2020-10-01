@@ -58,8 +58,8 @@ def verify_otp(otp):
 
 def generate_otp(mobile):
     totp = pyotp.TOTP('base32secret3232')
-    print(totp.now())
-    send_sms(mobile, totp.now())
+    return totp.now()
+    # send_sms(mobile, totp.now())
 
 
 def send_sms(mobile, generated_otp):

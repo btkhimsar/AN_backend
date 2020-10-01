@@ -1,7 +1,7 @@
-from mongoengine import Document, fields, EmbeddedDocument
+from mongoengine import DynamicDocument, fields, EmbeddedDocument
 
 
-class Request(Document):
+class Request(DynamicDocument):
     category_id = fields.StringField(max_length=50, required=True)
     location = fields.PointField(required=True)
     location_name = fields.StringField(required=True, max_length=100)

@@ -25,18 +25,18 @@ def login(request):
                 if len(user) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
-                    generate_otp(mobile)
+                    resp['otp'] = generate_otp(mobile)
 
                 elif len(user[0].name) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
-                    generate_otp(mobile)
+                    resp['otp'] = generate_otp(mobile)
 
                 else:
                     resp = create_resp_dict(True, USER_EXISTS)
                     resp['name'] = user[0].name
                     resp['newuser'] = False
-                    generate_otp(mobile)
+                    resp['otp'] = generate_otp(mobile)
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 

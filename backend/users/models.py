@@ -1,4 +1,4 @@
-from mongoengine import Document, fields, EmbeddedDocument
+from mongoengine import DynamicDocument, fields, EmbeddedDocument
 from Constants.image_urls import HOME_ICON
 from Constants.languages import LANGS
 from Constants.user_type import USER_TYPE
@@ -13,7 +13,7 @@ class ProviderInfo(EmbeddedDocument):
     radius = fields.IntField(default=5, required=False)
 
 
-class User(Document):
+class User(DynamicDocument):
     mobile = fields.StringField(max_length=10, required=True)
     name = fields.StringField(max_length=30, required=True)
     user_type = fields.StringField(choices=USER_TYPE, required=True, default="consumer")
