@@ -2,9 +2,10 @@ import datetime
 import jwt
 from django.conf import settings
 import pyotp
-from twilio.rest import Client
+import requests
 from .models import ProviderInfo
 from category.models import Category
+from .constants import params
 
 
 def request_json_for_provider(provider_info, language, resp):
@@ -37,7 +38,7 @@ def create_user_dict(user, resp):
 def generate_auth_token(user):
     request_auth_token = jwt.encode(payload={'id': str(user.id),
                                              'exp': datetime.datetime.utcnow() + datetime.timedelta(
-                                            days=1)}, key=settings.SECRET_KEY, algorithm='HS256')
+                                                 days=1)}, key=settings.SECRET_KEY, algorithm='HS256')
     return request_auth_token
 
 
@@ -46,28 +47,25 @@ def create_point_dict(latitude, longitude):
     return point
 
 
+def verify_otp(otp):
+    current_time = datetime.datetime.now()
+    totp = pyotp.TOTP('base32secret3232')
+    for i in range(-60, 1):
+        if str(otp) == str(totp.at(current_time, i)):
+            return True
+    return False
+
+
 def generate_otp(mobile):
     totp = pyotp.TOTP('base32secret3232')
-    generated_otp = totp.now()
-    check = send_sms(mobile, generated_otp)
-    if check is None:
-        return "OTP generated"
-    else:
-        return "Unverified Number"
+    print(totp.now())
+    send_sms(mobile, totp.now())
 
 
 def send_sms(mobile, generated_otp):
-    try:
-        account_sid = 'AC3b002160acdc829f1f84d9d791e1ae71'
-        auth_token = 'c62aca92bc25d65e54a9b33a39c397f3'
-        client = Client(account_sid, auth_token)
-
-        message = client.messages.create(
-            body='Your OTP is' + str(generated_otp), from_='+12095632935',
-            to='+91' + str(mobile))
-
-    except Exception as e:
-        return "Unverified Number"
+    params['receiver'] = mobile
+    params['sms'] = 'Your otp is {}'.format(generated_otp)
+    requests.get('http://staticking.org/index.php/smsapi/httpapi/', params=params)
 
 
 def update_provider_info(user, user_data, resp):

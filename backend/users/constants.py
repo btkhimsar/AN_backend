@@ -20,4 +20,10 @@ user_json = {
     "phone": '1111111111'
 }
 
-
+params = {
+    "uname": "rajathbtu",
+    "password": "mih@1234",
+    "sender": "RAJBTU",
+    "route": "TA",
+    "msgtype": "1"
+}

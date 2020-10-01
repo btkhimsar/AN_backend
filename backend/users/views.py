@@ -3,10 +3,10 @@ from http import HTTPStatus
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 from Constants.response_strings import *
-from Constants.otp import user_otp
 from util.response import create_resp_dict, token_required
 from .models import User
 from .utility import *
+import request
 
 
 @api_view(['POST'])
@@ -25,15 +25,19 @@ def login(request):
                 if len(user) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
+                    generate_otp(mobile)
 
                 elif len(user[0].name) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
+                    generate_otp(mobile)
 
                 else:
                     resp = create_resp_dict(True, USER_EXISTS)
                     resp['name'] = user[0].name
                     resp['newuser'] = False
+                    generate_otp(mobile)
+
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
@@ -115,8 +119,7 @@ def auth(request):
 
                 user = User.objects(mobile=mobile)
 
-                if otp == user_otp:
-
+                if verify_otp(otp):
                     if len(user) == 0:
                         user_type = body_data['user_type']
                         new_user = User(mobile=mobile, name=name, user_type=user_type,
