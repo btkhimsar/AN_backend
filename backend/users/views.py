@@ -6,7 +6,7 @@ from Constants.response_strings import *
 from util.response import create_resp_dict, token_required
 from .models import User
 from .utility import *
-import request
+from Constants.otp import user_otp
 
 
 @api_view(['POST'])
@@ -25,18 +25,18 @@ def login(request):
                 if len(user) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
-                    resp['otp'] = generate_otp(mobile)
+                    # resp['otp'] = generate_otp(mobile)
 
                 elif len(user[0].name) == 0:
                     resp = create_resp_dict(True, OTP_GENERATED)
                     resp['newuser'] = True
-                    resp['otp'] = generate_otp(mobile)
+                    # resp['otp'] = generate_otp(mobile)
 
                 else:
                     resp = create_resp_dict(True, USER_EXISTS)
                     resp['name'] = user[0].name
                     resp['newuser'] = False
-                    resp['otp'] = generate_otp(mobile)
+                    # resp['otp'] = generate_otp(mobile)
 
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
@@ -98,8 +98,7 @@ def profile(request):
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -119,7 +118,7 @@ def auth(request):
 
                 user = User.objects(mobile=mobile)
 
-                if verify_otp(otp):
+                if otp == user_otp:
                     if len(user) == 0:
                         user_type = body_data['user_type']
                         new_user = User(mobile=mobile, name=name, user_type=user_type,
@@ -146,8 +145,7 @@ def auth(request):
                                         status=HTTPStatus.UNAUTHORIZED)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -173,10 +171,8 @@ def is_active(request):
                     resp = create_resp_dict(False, 'User Not Updated')
                     resp['error_code'] = 103
 
-                return JsonResponse(data=resp, safe=False,
-                                    status=HTTPStatus.OK)
+                return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 

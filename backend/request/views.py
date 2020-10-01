@@ -48,8 +48,7 @@ def work_requests(request):
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -81,8 +80,7 @@ def my_requests(request):
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -135,18 +133,7 @@ def create_request(request):
                 resp_data['requestId'] = str(request.id)
                 return JsonResponse(data=resp_data, safe=False, status=HTTPStatus.OK)
             except Exception as e:
-                resp = create_resp_dict(False, e)
-                if e == 'aud_url':
-                    resp['error_code'] = 105
-                    return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
-                elif e == 'comment':
-                    resp['error_code'] = 106
-                    return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
-                elif e == 'questions':
-                    resp['error_code'] = 107
-                    return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.OK)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -174,8 +161,7 @@ def request_completion(request):
                                     status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -209,8 +195,7 @@ def send_interest(request):
                                     status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -250,8 +235,7 @@ def get_request_details(request):
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -280,8 +264,7 @@ def interests_sent(request):
                 return JsonResponse(data=resp, safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
 
 
 @api_view(['POST'])
@@ -310,5 +293,4 @@ def mark_request_as_spam(request):
                 return JsonResponse(data=create_resp_dict(True, "Marked As Spam"), safe=False, status=HTTPStatus.OK)
 
             except Exception as e:
-                return JsonResponse(data=create_resp_dict(False, e), safe=False,
-                                    status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return JsonResponse(data=create_resp_dict(False, e), safe=False, status=HTTPStatus.OK)
